@@ -39,7 +39,7 @@ class PointageController extends Controller
         $nom = $request->session()->get('kiosque.nom');
         $request->session()->forget(['kiosque.identifie', 'kiosque.nom']);
 
-        $seance = Seance::where('statut', 'en_cours')->latest('heure_prevue')->first();
+        $seance = Seance::where('statut', 'en_cours')->whereDate('date', today())->latest('heure_prevue')->first();
 
         if (! $seance) {
             return view('kiosque.confirmation', [

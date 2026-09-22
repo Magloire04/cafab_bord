@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Coach;
 
 use App\Enums\SourcePointage;
-use App\Enums\StatutSeance;
 use App\Exceptions\PointageException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Coach\MarquerPresenteRequest;
@@ -24,10 +23,14 @@ class PointageController extends Controller
         $coach = $request->user()->coach;
 
         $seance = Seance::where('coach_id', $coach?->id)
-            ->whereIn('statut', ['en_cours', 'a_venir'])
-            ->orderBy('date')
-            ->orderBy('heure_prevue')
-            ->first();
+            ->where('statut', 'en_cours')
+            ->whereDate('date', today())
+            ->first()
+            ?? Seance::where('coach_id', $coach?->id)
+                ->where('statut', 'a_venir')
+                ->orderBy('date')
+                ->orderBy('heure_prevue')
+                ->first();
 
         $pointages = $seance ? $seance->pointages()->with('pointable')->get() : collect();
         $filles = Fille::where('statut', 'actif')->orderBy('nom')->get();
@@ -60,11 +63,7 @@ class PointageController extends Controller
         $seance = Seance::findOrFail($request->input('seance_id'));
         abort_if($seance->coach_id !== $request->user()->coach?->id, 403);
 
-        $seance->update([
-            'statut' => StatutSeance::Cloturee,
-            'cloturee_at' => now(),
-            'cloture_par_user_id' => $request->user()->id,
-        ]);
+        $seance->clore($request->user());
 
         return redirect()->route('coach.seance')->with('message', 'Séance clôturée.');
     }

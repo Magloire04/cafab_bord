@@ -9,4 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('seances:generer')->daily();
-Schedule::command('seances:demarrer')->everyMinute();
+Schedule::command('seances:demarrer')->everyMinute()->withoutOverlapping();
+Schedule::command('seances:cloturer')->everyMinute()->withoutOverlapping();

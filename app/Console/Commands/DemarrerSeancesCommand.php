@@ -17,7 +17,7 @@ class DemarrerSeancesCommand extends Command
     {
         $demarrees = Seance::where('statut', StatutSeance::AVenir)
             ->get()
-            ->filter(fn (Seance $seance) => $seance->heurePrevueCarbon()->lessThanOrEqualTo(Carbon::now()))
+            ->filter(fn (Seance $seance) => $seance->date->isToday() && $seance->heurePrevueCarbon()->lessThanOrEqualTo(Carbon::now()))
             ->each(fn (Seance $seance) => $seance->update(['statut' => StatutSeance::EnCours]))
             ->count();
 

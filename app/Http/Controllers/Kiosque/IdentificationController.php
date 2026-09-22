@@ -14,7 +14,7 @@ class IdentificationController extends Controller
 {
     public function home(): View
     {
-        $seance = Seance::where('statut', 'en_cours')->latest('heure_prevue')->first();
+        $seance = Seance::where('statut', 'en_cours')->whereDate('date', today())->latest('heure_prevue')->first();
 
         return view('kiosque.accueil', compact('seance'));
     }

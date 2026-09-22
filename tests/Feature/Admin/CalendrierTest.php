@@ -21,17 +21,23 @@ it('shows the admin the current month by default', function () {
 
 it('computes the taux de présence for a clôturée séance', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
-    $seance = Seance::factory()->create(['statut' => StatutSeance::Cloturee, 'date' => now()->toDateString()]);
+    $seance = Seance::factory()->create(['statut' => StatutSeance::EnCours, 'date' => now()->toDateString()]);
     $filles = Fille::factory()->count(4)->create();
 
-    foreach ($filles as $i => $fille) {
+    // Only 3 of the 4 filles self-pointed before clôture; Seance::clore()
+    // is expected to materialize the 4th as "absent" — exercising the
+    // real clôture path rather than fabricating the absence by hand keeps
+    // this test honest about where the absence actually comes from.
+    foreach ($filles->take(3) as $fille) {
         Pointage::factory()->create([
             'seance_id' => $seance->id,
             'pointable_type' => Fille::class,
             'pointable_id' => $fille->id,
-            'statut_ponctualite' => $i === 0 ? 'absent' : 'a_l_heure',
+            'statut_ponctualite' => 'a_l_heure',
         ]);
     }
+
+    $seance->clore();
 
     $response = $this->actingAs($admin)->get(route('admin.calendrier', ['mois' => now()->format('Y-m')]));
 
