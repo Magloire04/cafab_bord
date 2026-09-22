@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
+use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('filles/import', [FilleImportController::class, 'form'])->name('filles.import');
     Route::post('filles/import/preview', [FilleImportController::class, 'preview'])->name('filles.import.preview');
     Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])->name('filles.import.confirm');
+
+    Route::resource('plannings', PlanningController::class)
+        ->except(['show', 'destroy'])
+        ->parameters(['plannings' => 'planning']);
+    Route::patch('plannings/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])
+        ->name('plannings.toggle-actif');
 });
 
 require __DIR__.'/auth.php';
