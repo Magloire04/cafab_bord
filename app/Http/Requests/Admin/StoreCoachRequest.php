@@ -15,7 +15,7 @@ class StoreCoachRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'contact' => ['nullable', 'string', 'max:50'],
             'date_entree' => ['required', 'date'],
         ];

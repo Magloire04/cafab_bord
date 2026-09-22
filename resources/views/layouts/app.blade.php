@@ -14,6 +14,14 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
+            @if (session('message'))
+                <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+                    <div class="bg-green-100 border border-green-300 text-green-800 rounded-md px-4 py-3">
+                        {{ session('message') }}
+                    </div>
+                </div>
+            @endif
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">

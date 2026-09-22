@@ -21,7 +21,7 @@ class FilleImportController extends Controller
     public function preview(Request $request): View
     {
         $request->validate([
-            'fichier' => ['required', 'file', 'mimes:xlsx,xls'],
+            'fichier' => ['required', 'file', 'mimes:xlsx,xls', 'max:2048'],
         ]);
 
         $import = new FillesPreviewImport;

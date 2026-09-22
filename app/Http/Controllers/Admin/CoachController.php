@@ -11,6 +11,7 @@ use App\Models\Coach;
 use App\Models\User;
 use App\Services\PinGenerator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -31,19 +32,21 @@ class CoachController extends Controller
 
     public function store(StoreCoachRequest $request, PinGenerator $pinGenerator): RedirectResponse
     {
-        $user = User::create([
-            'name' => $request->string('name'),
-            'email' => $request->string('email'),
-            'role' => UserRole::Coach,
-            'password' => Hash::make(Str::password(16)),
-        ]);
+        DB::transaction(function () use ($request, $pinGenerator) {
+            $user = User::create([
+                'name' => $request->string('name'),
+                'email' => $request->string('email'),
+                'role' => UserRole::Coach,
+                'password' => Hash::make(Str::password(16)),
+            ]);
 
-        Coach::create([
-            'user_id' => $user->id,
-            'pin' => $pinGenerator->generate(),
-            'contact' => $request->string('contact')->value() ?: null,
-            'date_entree' => $request->date('date_entree'),
-        ]);
+            Coach::create([
+                'user_id' => $user->id,
+                'pin' => $pinGenerator->generate(),
+                'contact' => $request->string('contact')->value() ?: null,
+                'date_entree' => $request->date('date_entree'),
+            ]);
+        });
 
         return redirect()->route('admin.coaches.index')->with('message', 'Coach ajouté.');
     }
