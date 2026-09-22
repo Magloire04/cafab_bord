@@ -24,3 +24,17 @@ it('rejects a duplicate pin', function () {
 
     Coach::factory()->create(['pin' => '1234']);
 })->throws(QueryException::class);
+
+it('blocks deleting the linked user account', function () {
+    $user = User::factory()->create(['role' => UserRole::Coach]);
+    Coach::factory()->create(['user_id' => $user->id]);
+
+    $user->delete();
+})->throws(QueryException::class);
+
+it('rejects a second coach row for the same user', function () {
+    $user = User::factory()->create(['role' => UserRole::Coach]);
+    Coach::factory()->create(['user_id' => $user->id]);
+
+    Coach::factory()->create(['user_id' => $user->id]);
+})->throws(QueryException::class);

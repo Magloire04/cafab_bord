@@ -4,11 +4,21 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_registration_is_disabled(): void
+    {
+        $this->assertFalse(Route::has('register'));
+
+        $response = $this->get('/register');
+
+        $response->assertNotFound();
+    }
 
     public function test_login_screen_can_be_rendered(): void
     {
