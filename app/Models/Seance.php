@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Seance extends Model
@@ -96,24 +98,51 @@ class Seance extends Model
                 'cloture_par_user_id' => $parUser?->id,
             ]);
 
-            $dejaPointees = $this->pointages()
-                ->where('pointable_type', Fille::class)
-                ->pluck('pointable_id');
+            $dejaPointees = $this->fillesDejaPointees();
 
             Fille::where('statut', 'actif')
                 ->whereNotIn('id', $dejaPointees)
                 ->get()
                 ->each(function (Fille $fille) {
-                    Pointage::create([
-                        'seance_id' => $this->id,
-                        'pointable_type' => Fille::class,
-                        'pointable_id' => $fille->id,
-                        'pointe_a' => null,
-                        'statut_ponctualite' => StatutPonctualite::Absent,
-                        'minutes_retard' => null,
-                        'source' => SourcePointage::Coach,
-                    ]);
+                    try {
+                        Pointage::create([
+                            'seance_id' => $this->id,
+                            'pointable_type' => Fille::class,
+                            'pointable_id' => $fille->id,
+                            'pointe_a' => null,
+                            'statut_ponctualite' => StatutPonctualite::Absent,
+                            'minutes_retard' => null,
+                            'source' => SourcePointage::Coach,
+                        ]);
+                    } catch (QueryException $e) {
+                        // Backstop for a race between the pluck() above and
+                        // this insert: a latecomer self-pointing (or being
+                        // marked present) in the same instant as the
+                        // clôture. The DB-level unique constraint on
+                        // (seance, pointable) rejects our insert — that's
+                        // correct, not an error: someone else's real
+                        // pointage won the race, so this fille should not
+                        // be marked absent. Skip her and let the clôture
+                        // continue rather than aborting the whole
+                        // transaction, mirroring PointageService::pointer()'s
+                        // handling of the same race.
+                    }
                 });
         });
+    }
+
+    /**
+     * Pre-check used to skip filles who already have a pointage before
+     * attempting each insert. Extracted as its own method (rather than
+     * inlined) so tests can simulate the race window where a fille's real
+     * pointage is recorded after this check runs but before the
+     * corresponding insert in clore() — the DB-level unique constraint is
+     * the real backstop for that case, exercised via the try/catch there.
+     */
+    protected function fillesDejaPointees(): Collection
+    {
+        return $this->pointages()
+            ->where('pointable_type', Fille::class)
+            ->pluck('pointable_id');
     }
 }
