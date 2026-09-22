@@ -124,6 +124,7 @@ git commit -m "docs: add fondations implementation plan"
 - Create: `app/Http/Middleware/EnsureUserHasRole.php`
 - Modify: `bootstrap/app.php` (register the `role` middleware alias, remove/guard the registration route)
 - Modify: `routes/auth.php` (drop the public registration route — Breeze generates one by default)
+- Modify: `routes/web.php` (add a permanent `/admin/ping` smoke route for the role middleware, used only by this task's test)
 - Create: `app/Console/Commands/CreateUserCommand.php`
 - Test: `tests/Feature/Auth/RoleMiddlewareTest.php`
 - Test: `tests/Feature/Console/CreateUserCommandTest.php`
@@ -1487,7 +1488,6 @@ Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regenera
     </x-slot>
 
     <a href="{{ route('admin.filles.create') }}">Ajouter une fille</a>
-    <a href="{{ route('admin.filles.import') }}">Importer depuis Excel</a>
 
     <table>
         <thead>
@@ -1532,7 +1532,7 @@ Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regenera
 </x-app-layout>
 ```
 
-(The `admin.filles.import` link is wired up in Task 7 — leave it in place now, Task 7 adds the matching route.)
+Task 7 adds the "Importer depuis Excel" link to this view once the import route exists — adding it here would make this task's own test fail with a `RouteNotFoundException` before that route is defined.
 
 `resources/views/admin/filles/create.blade.php`:
 
@@ -1622,6 +1622,7 @@ git commit -m "feat: add fille registre management (admin)"
 - Create: `app/Imports/FillesPreviewImport.php`
 - Create: `app/Http/Controllers/Admin/FilleImportController.php`
 - Modify: `routes/web.php` (add `admin.filles.import*` routes)
+- Modify: `resources/views/admin/filles/index.blade.php` (add the "Importer depuis Excel" link now that the route exists)
 - Create: `resources/views/admin/filles/import.blade.php`
 - Create: `resources/views/admin/filles/import-preview.blade.php`
 - Test: `tests/Feature/Admin/FilleImportTest.php`
@@ -1847,7 +1848,16 @@ Route::post('filles/import/preview', [FilleImportController::class, 'preview'])-
 Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])->name('filles.import.confirm');
 ```
 
-- [ ] **Step 7: Create the views**
+- [ ] **Step 7: Add the import link to the filles index**
+
+In `resources/views/admin/filles/index.blade.php` (created in Task 6), add the link right after the "Ajouter une fille" link:
+
+```blade
+    <a href="{{ route('admin.filles.create') }}">Ajouter une fille</a>
+    <a href="{{ route('admin.filles.import') }}">Importer depuis Excel</a>
+```
+
+- [ ] **Step 8: Create the import views**
 
 `resources/views/admin/filles/import.blade.php`:
 
@@ -1910,7 +1920,7 @@ Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])-
 </x-app-layout>
 ```
 
-- [ ] **Step 8: Run the test to verify it passes**
+- [ ] **Step 9: Run the test to verify it passes**
 
 ```bash
 vendor/bin/pest tests/Feature/Admin/FilleImportTest.php
@@ -1918,7 +1928,7 @@ vendor/bin/pest tests/Feature/Admin/FilleImportTest.php
 
 Expected: PASS.
 
-- [ ] **Step 9: Format and commit**
+- [ ] **Step 10: Format and commit**
 
 ```bash
 vendor/bin/pint
