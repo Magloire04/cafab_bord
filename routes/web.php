@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\Admin\PlanningController;
+use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
 use App\Http\Controllers\ProfileController;
@@ -52,6 +53,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->parameters(['plannings' => 'planning']);
     Route::patch('plannings/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])
         ->name('plannings.toggle-actif');
+});
+
+Route::middleware(['auth', 'role:coach'])->prefix('coach')->name('coach.')->group(function () {
+    Route::get('ma-seance', [CoachPointageController::class, 'show'])->name('seance');
+    Route::patch('ma-seance/marquer-presente', [CoachPointageController::class, 'marquerPresente'])->name('seance.marquer-presente');
+    Route::patch('ma-seance/cloturer', [CoachPointageController::class, 'cloturer'])->name('seance.cloturer');
 });
 
 Route::prefix('kiosque')->name('kiosque.')->group(function () {

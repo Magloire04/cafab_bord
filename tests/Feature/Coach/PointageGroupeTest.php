@@ -1,0 +1,102 @@
+<?php
+
+use App\Enums\SourcePointage;
+use App\Enums\StatutSeance;
+use App\Enums\UserRole;
+use App\Models\Coach;
+use App\Models\Fille;
+use App\Models\Pointage;
+use App\Models\Seance;
+use App\Models\User;
+
+beforeEach(function () {
+    $this->coach = Coach::factory()->create();
+    $this->coachUser = $this->coach->user;
+    $this->seance = Seance::factory()->create(['coach_id' => $this->coach->id, 'statut' => StatutSeance::EnCours]);
+});
+
+it('blocks an admin from the coach roll-call screen', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $this->actingAs($admin)->get(route('coach.seance'))->assertForbidden();
+});
+
+it('shows the current séance to its referent coach', function () {
+    $this->actingAs($this->coachUser)->get(route('coach.seance'))->assertOk();
+});
+
+it('lets the coach mark a fille present who has not yet self-pointed', function () {
+    $fille = Fille::factory()->create();
+
+    $response = $this->actingAs($this->coachUser)->patch(route('coach.seance.marquer-presente'), [
+        'seance_id' => $this->seance->id,
+        'pointable_type' => Fille::class,
+        'pointable_id' => $fille->id,
+    ]);
+
+    $response->assertRedirect();
+    $pointage = Pointage::where('pointable_id', $fille->id)->first();
+    expect($pointage->source)->toBe(SourcePointage::Coach);
+    expect($pointage->pointe_par_user_id)->toBe($this->coachUser->id);
+});
+
+it('lets the coach backdate a pointage to a specific time rather than now', function () {
+    $fille = Fille::factory()->create();
+
+    $this->actingAs($this->coachUser)->patch(route('coach.seance.marquer-presente'), [
+        'seance_id' => $this->seance->id,
+        'pointable_type' => Fille::class,
+        'pointable_id' => $fille->id,
+        'heure' => '17:02',
+    ]);
+
+    $pointage = Pointage::where('pointable_id', $fille->id)->first();
+    expect($pointage->pointe_a->format('H:i'))->toBe('17:02');
+});
+
+it('refuses to let the coach overwrite a pointage the fille already made herself', function () {
+    $fille = Fille::factory()->create();
+    Pointage::factory()->create([
+        'seance_id' => $this->seance->id,
+        'pointable_type' => Fille::class,
+        'pointable_id' => $fille->id,
+        'source' => 'auto',
+    ]);
+
+    $response = $this->actingAs($this->coachUser)->patch(route('coach.seance.marquer-presente'), [
+        'seance_id' => $this->seance->id,
+        'pointable_type' => Fille::class,
+        'pointable_id' => $fille->id,
+    ]);
+
+    $response->assertSessionHasErrors();
+    expect(Pointage::where('pointable_id', $fille->id)->count())->toBe(1);
+});
+
+it('lets the coach clôturer the séance', function () {
+    $this->actingAs($this->coachUser)->patch(route('coach.seance.cloturer'), ['seance_id' => $this->seance->id]);
+
+    expect($this->seance->fresh()->statut)->toBe(StatutSeance::Cloturee);
+    expect($this->seance->fresh()->cloture_par_user_id)->toBe($this->coachUser->id);
+});
+
+it('blocks a coach from marking presence on a séance that is not theirs', function () {
+    $autreCoach = Coach::factory()->create();
+    $fille = Fille::factory()->create();
+
+    $this->actingAs($autreCoach->user)->patch(route('coach.seance.marquer-presente'), [
+        'seance_id' => $this->seance->id,
+        'pointable_type' => Fille::class,
+        'pointable_id' => $fille->id,
+    ])->assertForbidden();
+});
+
+it('blocks a coach from clôturing a séance that is not theirs', function () {
+    $autreCoach = Coach::factory()->create();
+
+    $this->actingAs($autreCoach->user)->patch(route('coach.seance.cloturer'), [
+        'seance_id' => $this->seance->id,
+    ])->assertForbidden();
+
+    expect($this->seance->fresh()->statut)->toBe(StatutSeance::EnCours);
+});
