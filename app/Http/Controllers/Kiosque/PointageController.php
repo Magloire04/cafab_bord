@@ -24,11 +24,26 @@ class PointageController extends Controller
         }
 
         $personne = $identifie['type']::find($identifie['id']);
+
+        if (! $personne) {
+            $request->session()->forget(['kiosque.identifie', 'kiosque.nom']);
+
+            return redirect()->route('kiosque.home');
+        }
+
+        // The kiosk session (identifie/nom) belongs to a single tap: once we
+        // know who we're pointing for, clear it up front so it never lingers
+        // past this request — on the success path below as well as either
+        // error path — regardless of whether the client-side redirect timer
+        // in the confirmation view ever fires.
+        $nom = $request->session()->get('kiosque.nom');
+        $request->session()->forget(['kiosque.identifie', 'kiosque.nom']);
+
         $seance = Seance::where('statut', 'en_cours')->latest('heure_prevue')->first();
 
         if (! $seance) {
             return view('kiosque.confirmation', [
-                'nom' => $request->session()->get('kiosque.nom'),
+                'nom' => $nom,
                 'erreur' => 'Aucune répétition en cours pour le moment.',
             ]);
         }
@@ -37,12 +52,10 @@ class PointageController extends Controller
             $pointage = $pointageService->pointer($seance, $personne, Carbon::now(), SourcePointage::Auto);
         } catch (PointageException $e) {
             return view('kiosque.confirmation', [
-                'nom' => $request->session()->get('kiosque.nom'),
+                'nom' => $nom,
                 'erreur' => $e->getMessage(),
             ]);
         }
-
-        $request->session()->forget(['kiosque.identifie', 'kiosque.nom']);
 
         return view('kiosque.confirmation', [
             'nom' => $identifie['type'] === Fille::class ? "{$personne->prenom}" : $personne->user->name,
