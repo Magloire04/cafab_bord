@@ -18,7 +18,7 @@ class CoachFactory extends Factory
             'pin' => sprintf('%04d', fake()->unique()->randomNumber(4)),
             'contact' => fake()->optional()->phoneNumber(),
             'statut' => 'actif',
-            'date_entree' => fake()->date('Y-m-d', '-2 years'),
+            'date_entree' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
         ];
     }
 }

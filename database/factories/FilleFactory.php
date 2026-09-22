@@ -13,11 +13,11 @@ class FilleFactory extends Factory
     {
         return [
             'nom' => fake()->lastName(),
-            'prenom' => fake()->firstName(),
+            'prenom' => fake()->firstName('female'),
             'contact' => fake()->optional()->phoneNumber(),
             'pin' => sprintf('%04d', fake()->unique()->randomNumber(4)),
             'statut' => 'actif',
-            'date_entree' => fake()->date('Y-m-d', '-2 years'),
+            'date_entree' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
         ];
     }
 }
