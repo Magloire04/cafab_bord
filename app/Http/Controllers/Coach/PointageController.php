@@ -7,7 +7,9 @@ use App\Enums\StatutSeance;
 use App\Exceptions\PointageException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Coach\MarquerPresenteRequest;
+use App\Models\Coach;
 use App\Models\Fille;
+use App\Models\Pointage;
 use App\Models\Seance;
 use App\Services\PointageService;
 use Illuminate\Http\RedirectResponse;
@@ -65,5 +67,18 @@ class PointageController extends Controller
         ]);
 
         return redirect()->route('coach.seance')->with('message', 'Séance clôturée.');
+    }
+
+    public function historique(Request $request): View
+    {
+        $coach = $request->user()->coach;
+
+        $pointages = Pointage::where('pointable_type', Coach::class)
+            ->where('pointable_id', $coach?->id)
+            ->with('seance')
+            ->orderByDesc('pointe_a')
+            ->paginate(30);
+
+        return view('coach.historique', compact('pointages'));
     }
 }
