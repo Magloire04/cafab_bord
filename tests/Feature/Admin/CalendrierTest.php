@@ -6,6 +6,7 @@ use App\Models\Fille;
 use App\Models\Pointage;
 use App\Models\Seance;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 it('blocks a coach from the admin calendar', function () {
     $coach = User::factory()->create(['role' => UserRole::Coach]);
@@ -17,6 +18,26 @@ it('shows the admin the current month by default', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
 
     $this->actingAs($admin)->get(route('admin.calendrier'))->assertOk();
+});
+
+it('rejects a malformed mois query param instead of 500ing', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.calendrier', ['mois' => 'abc']))
+        ->assertSessionHasErrors('mois');
+});
+
+it('resolves ?mois= on a day-of-month that does not exist in the target month, without overflowing', function () {
+    Carbon::setTestNow('2026-01-31');
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+    $response = $this->actingAs($admin)->get(route('admin.calendrier', ['mois' => '2026-02']));
+
+    $response->assertOk();
+    $response->assertViewHas('mois', fn ($mois) => $mois->format('Y-m') === '2026-02');
+
+    Carbon::setTestNow();
 });
 
 it('computes the taux de présence for a clôturée séance', function () {

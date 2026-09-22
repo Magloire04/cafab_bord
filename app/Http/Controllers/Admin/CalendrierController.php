@@ -6,15 +6,18 @@ use App\Enums\StatutPonctualite;
 use App\Enums\StatutSeance;
 use App\Http\Controllers\Controller;
 use App\Models\Seance;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class CalendrierController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $mois = request()->filled('mois')
-            ? Carbon::createFromFormat('Y-m', request('mois'))
+        $request->validate(['mois' => ['nullable', 'date_format:Y-m']]);
+
+        $mois = $request->filled('mois')
+            ? Carbon::createFromFormat('!Y-m', $request->string('mois'))
             : Carbon::now();
 
         $debut = $mois->copy()->startOfMonth();
