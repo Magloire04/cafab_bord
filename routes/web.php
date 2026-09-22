@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CalendrierController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
@@ -53,6 +54,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->parameters(['plannings' => 'planning']);
     Route::patch('plannings/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])
         ->name('plannings.toggle-actif');
+
+    Route::get('calendrier', [CalendrierController::class, 'index'])->name('calendrier');
 });
 
 Route::middleware(['auth', 'role:coach'])->prefix('coach')->name('coach.')->group(function () {
