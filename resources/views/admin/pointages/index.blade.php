@@ -38,6 +38,7 @@
                                 <option value="retard_fort">Retard fort</option>
                                 <option value="absent">Absent</option>
                             </select>
+                            <input type="number" name="minutes_retard" placeholder="Minutes de retard" min="0">
                             <input type="text" name="motif" placeholder="Motif de la correction" required>
                             <button type="submit">Corriger</button>
                         </form>

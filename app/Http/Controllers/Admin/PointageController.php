@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\StatutPonctualite;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CorrigerPointageRequest;
 use App\Models\Pointage;
@@ -27,8 +28,18 @@ class PointageController extends Controller
 
     public function corriger(CorrigerPointageRequest $request, Pointage $pointage): RedirectResponse
     {
+        $statut = StatutPonctualite::from($request->validated('statut_ponctualite'));
+
+        $minutesRetard = match ($statut) {
+            StatutPonctualite::ALHeure, StatutPonctualite::Absent => 0,
+            StatutPonctualite::EnRetard, StatutPonctualite::RetardFort => $request->filled('minutes_retard')
+                ? $request->validated('minutes_retard')
+                : $pointage->minutes_retard,
+        };
+
         $pointage->update([
-            'statut_ponctualite' => $request->validated('statut_ponctualite'),
+            'statut_ponctualite' => $statut,
+            'minutes_retard' => $minutesRetard,
             'corrige_par_user_id' => $request->user()->id,
             'motif_correction' => $request->validated('motif'),
         ]);

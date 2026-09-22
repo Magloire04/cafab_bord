@@ -47,6 +47,37 @@ it('lets the admin correct a pointage with a mandatory motif', function () {
     expect($pointage->statut_ponctualite->value)->toBe('a_l_heure');
     expect($pointage->corrige_par_user_id)->toBe($this->admin->id);
     expect($pointage->motif_correction)->not->toBeNull();
+    expect($pointage->minutes_retard)->toBe(0);
+});
+
+it('keeps the submitted minutes_retard when correcting to en_retard', function () {
+    $pointage = Pointage::factory()->create(['statut_ponctualite' => 'retard_fort', 'minutes_retard' => 25]);
+
+    $response = $this->actingAs($this->admin)->patch(route('admin.pointages.corriger', $pointage), [
+        'statut_ponctualite' => 'en_retard',
+        'minutes_retard' => 8,
+        'motif' => 'Corrigé après vérification de la vidéo.',
+    ]);
+
+    $response->assertRedirect();
+    $pointage->refresh();
+    expect($pointage->statut_ponctualite->value)->toBe('en_retard');
+    expect($pointage->minutes_retard)->toBe(8);
+});
+
+it('leaves the stored minutes_retard unchanged if not resubmitted when correcting to en_retard', function () {
+    $pointage = Pointage::factory()->create(['statut_ponctualite' => 'a_l_heure', 'minutes_retard' => 0]);
+    $pointage->forceFill(['minutes_retard' => 12])->save();
+
+    $response = $this->actingAs($this->admin)->patch(route('admin.pointages.corriger', $pointage), [
+        'statut_ponctualite' => 'en_retard',
+        'motif' => 'Corrigé après vérification de la vidéo.',
+    ]);
+
+    $response->assertRedirect();
+    $pointage->refresh();
+    expect($pointage->statut_ponctualite->value)->toBe('en_retard');
+    expect($pointage->minutes_retard)->toBe(12);
 });
 
 it('rejects a correction without a motif', function () {
