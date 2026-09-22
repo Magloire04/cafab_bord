@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\Admin\PlanningController;
+use App\Http\Controllers\Kiosque\IdentificationController;
+use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SeanceController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +52,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->parameters(['plannings' => 'planning']);
     Route::patch('plannings/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])
         ->name('plannings.toggle-actif');
+});
+
+Route::prefix('kiosque')->name('kiosque.')->group(function () {
+    Route::get('/', [IdentificationController::class, 'home'])->name('home');
+    Route::post('identifier', [IdentificationController::class, 'identifier'])
+        ->middleware('throttle:20,1')
+        ->name('identifier');
+    Route::get('menu', [IdentificationController::class, 'menu'])->name('menu');
+    Route::post('pointer', [KiosquePointageController::class, 'store'])->name('pointer');
 });
 
 require __DIR__.'/auth.php';
