@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SeanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,6 +22,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->get('/admin/ping', fn () => 'pong');
+
+Route::middleware(['auth', 'role:admin,coach'])->group(function () {
+    Route::get('seances/extraordinaire/creer', [SeanceController::class, 'create'])->name('seances.create-extraordinaire');
+    Route::post('seances/extraordinaire', [SeanceController::class, 'store'])->name('seances.store-extraordinaire');
+});
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('coaches', CoachController::class)->except(['show', 'destroy']);
