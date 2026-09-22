@@ -24,6 +24,34 @@
                         <x-nav-link :href="route('admin.filles.index')" :active="request()->routeIs('admin.filles.*')">
                             {{ __('Filles') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.plannings.index')" :active="request()->routeIs('admin.plannings.*')">
+                            {{ __('Planning') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.calendrier')" :active="request()->routeIs('admin.calendrier')">
+                            {{ __('Calendrier') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('admin.pointages.index')" :active="request()->routeIs('admin.pointages.*')">
+                            {{ __('Pointages') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if (auth()->user()->role === \App\Enums\UserRole::Coach)
+                        <x-nav-link :href="route('coach.seance')" :active="request()->routeIs('coach.seance')">
+                            {{ __('Ma répétition') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('coach.historique')" :active="request()->routeIs('coach.historique')">
+                            {{ __('Mon historique') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if (in_array(auth()->user()->role, [\App\Enums\UserRole::Admin, \App\Enums\UserRole::Coach]))
+                        <x-nav-link :href="route('seances.create-extraordinaire')" :active="request()->routeIs('seances.create-extraordinaire')">
+                            {{ __('Séance extraordinaire') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -86,6 +114,34 @@
 
                 <x-responsive-nav-link :href="route('admin.filles.index')" :active="request()->routeIs('admin.filles.*')">
                     {{ __('Filles') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.plannings.index')" :active="request()->routeIs('admin.plannings.*')">
+                    {{ __('Planning') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.calendrier')" :active="request()->routeIs('admin.calendrier')">
+                    {{ __('Calendrier') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.pointages.index')" :active="request()->routeIs('admin.pointages.*')">
+                    {{ __('Pointages') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if (auth()->user()->role === \App\Enums\UserRole::Coach)
+                <x-responsive-nav-link :href="route('coach.seance')" :active="request()->routeIs('coach.seance')">
+                    {{ __('Ma répétition') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('coach.historique')" :active="request()->routeIs('coach.historique')">
+                    {{ __('Mon historique') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if (in_array(auth()->user()->role, [\App\Enums\UserRole::Admin, \App\Enums\UserRole::Coach]))
+                <x-responsive-nav-link :href="route('seances.create-extraordinaire')" :active="request()->routeIs('seances.create-extraordinaire')">
+                    {{ __('Séance extraordinaire') }}
                 </x-responsive-nav-link>
             @endif
         </div>
