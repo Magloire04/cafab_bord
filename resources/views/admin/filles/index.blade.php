@@ -4,6 +4,7 @@
     </x-slot>
 
     <a href="{{ route('admin.filles.create') }}">Ajouter une fille</a>
+    <a href="{{ route('admin.filles.import') }}">Importer depuis Excel</a>
 
     <table>
         <thead>

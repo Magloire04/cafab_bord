@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
+use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('filles.toggle-statut');
     Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regeneratePin'])
         ->name('filles.regenerate-pin');
+
+    Route::get('filles/import', [FilleImportController::class, 'form'])->name('filles.import');
+    Route::post('filles/import/preview', [FilleImportController::class, 'preview'])->name('filles.import.preview');
+    Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])->name('filles.import.confirm');
 });
 
 require __DIR__.'/auth.php';
