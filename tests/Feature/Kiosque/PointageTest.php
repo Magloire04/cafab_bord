@@ -20,6 +20,22 @@ it('lets an identified fille pointer her presence at the séance en cours', func
     expect($pointage->source)->toBe(SourcePointage::Auto);
 });
 
+it('picks the séance en_cours dated today over a stale one dated yesterday', function () {
+    $fille = Fille::factory()->create(['pin' => '1234']);
+    $hier = Seance::factory()->create(['statut' => StatutSeance::EnCours, 'date' => now()->subDay()->toDateString(), 'heure_prevue' => '19:00:00']);
+    $aujourdhui = Seance::factory()->create(['statut' => StatutSeance::EnCours, 'date' => now()->toDateString(), 'heure_prevue' => '17:00:00']);
+
+    $this->post(route('kiosque.identifier'), ['pin' => '1234']);
+
+    $response = $this->post(route('kiosque.pointer'));
+
+    $response->assertOk();
+    $pointage = Pointage::where('pointable_type', Fille::class)->where('pointable_id', $fille->id)->first();
+    expect($pointage)->not->toBeNull();
+    expect($pointage->seance_id)->toBe($aujourdhui->id);
+    expect($pointage->seance_id)->not->toBe($hier->id);
+});
+
 it('refuses to pointer without an identified session', function () {
     Seance::factory()->create(['statut' => StatutSeance::EnCours]);
 
