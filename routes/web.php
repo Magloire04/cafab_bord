@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CoachController;
+use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('coaches.toggle-statut');
     Route::patch('coaches/{coach}/regenerate-pin', [CoachController::class, 'regeneratePin'])
         ->name('coaches.regenerate-pin');
+
+    Route::resource('filles', FilleController::class)->except(['show', 'destroy']);
+    Route::patch('filles/{fille}/toggle-statut', [FilleController::class, 'toggleStatut'])
+        ->name('filles.toggle-statut');
+    Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regeneratePin'])
+        ->name('filles.regenerate-pin');
 });
 
 require __DIR__.'/auth.php';
