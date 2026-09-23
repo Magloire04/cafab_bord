@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatutCachet;
+use App\Enums\StatutPrestation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -75,5 +76,17 @@ class Cachet extends Model
         if ($filleId) {
             $query->where('fille_id', $filleId);
         }
+    }
+
+    /**
+     * Cachets qu'une fille peut déclarer au kiosque : non finalisés, pour une
+     * prestation active déjà passée. Partagé par le menu kiosque (compte),
+     * l'écran de déclaration (liste) et la confirmation de pointage (compte).
+     */
+    public function scopeEligiblesDeclaration(Builder $query, int $filleId): void
+    {
+        $query->where('fille_id', $filleId)
+            ->whereIn('statut', [StatutCachet::Du, StatutCachet::DeclareePayee, StatutCachet::DeclareeNonPayee])
+            ->whereHas('prestation', fn (Builder $q) => $q->where('statut', StatutPrestation::Active)->where('date', '<', today()));
     }
 }

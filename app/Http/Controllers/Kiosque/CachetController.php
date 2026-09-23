@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Kiosque;
 
-use App\Enums\StatutCachet;
-use App\Enums\StatutPrestation;
 use App\Exceptions\CachetException;
 use App\Http\Controllers\Controller;
 use App\Models\Cachet;
@@ -25,11 +23,7 @@ class CachetController extends Controller
 
         $fille = Fille::findOrFail($identifie['id']);
 
-        $cachets = Cachet::where('fille_id', $fille->id)
-            ->whereIn('statut', [StatutCachet::Du, StatutCachet::DeclareePayee, StatutCachet::DeclareeNonPayee])
-            ->whereHas('prestation', fn ($q) => $q->where('statut', StatutPrestation::Active)->where('date', '<', today()))
-            ->with('prestation')
-            ->get();
+        $cachets = Cachet::eligiblesDeclaration($fille->id)->with('prestation')->get();
 
         return view('kiosque.cachets.index', [
             'nom' => $request->session()->get('kiosque.nom'),

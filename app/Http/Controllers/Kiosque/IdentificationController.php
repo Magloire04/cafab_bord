@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Kiosque;
 
-use App\Enums\StatutCachet;
-use App\Enums\StatutPrestation;
 use App\Http\Controllers\Controller;
 use App\Models\Cachet;
 use App\Models\Fille;
@@ -54,14 +52,14 @@ class IdentificationController extends Controller
             return redirect()->route('kiosque.home');
         }
 
-        $cachetsEligibles = $identifie['type'] === Fille::class && Cachet::where('fille_id', $identifie['id'])
-            ->whereIn('statut', [StatutCachet::Du, StatutCachet::DeclareePayee, StatutCachet::DeclareeNonPayee])
-            ->whereHas('prestation', fn ($q) => $q->where('statut', StatutPrestation::Active)->where('date', '<', today()))
-            ->exists();
+        $cachetsEnAttente = $identifie['type'] === Fille::class
+            ? Cachet::eligiblesDeclaration($identifie['id'])->count()
+            : 0;
 
         return view('kiosque.menu', [
             'nom' => $request->session()->get('kiosque.nom'),
-            'cachetsEligibles' => $cachetsEligibles,
+            'cachetsEligibles' => $cachetsEnAttente > 0,
+            'cachetsEnAttente' => $cachetsEnAttente,
         ]);
     }
 }

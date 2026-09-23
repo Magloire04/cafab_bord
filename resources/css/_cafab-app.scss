@@ -344,3 +344,235 @@ textarea.field-control {
     font-size: 24px;
   }
 }
+
+/* Kiosque : barres et zones que cafab-tokens.scss ne détaille pas */
+.kiosk-topbar,
+.kiosk-bottombar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.kiosk-topbar {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.kiosk-bottombar {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  margin-top: 32px;
+}
+
+.kiosk-logo {
+  height: 56px;
+  width: auto;
+}
+
+.kiosk-clock {
+  font-size: 28px;
+}
+
+.kiosk-pin-panel {
+  max-width: 480px;
+}
+
+.kiosk-subtitle {
+  font-size: 16px;
+}
+
+.kiosk-error-text {
+  font-size: 15px;
+}
+
+.pin-dot {
+  width: 64px;
+  flex: none;
+}
+
+/* Kiosque : écran sombre après identification (menu, choix de l'action) */
+.kiosk-dark {
+  background: var(--ink);
+  color: #fff;
+  min-height: 100vh;
+  padding: 40px 60px;
+}
+
+.kiosk-dark .field-hint {
+  color: var(--sidebar-text);
+}
+
+.kiosk-dark h1,
+.kiosk-dark h2,
+.kiosk-dark h3,
+.kiosk-dark .display {
+  color: #fff;
+}
+
+.kiosk-dark .kiosk-topbar,
+.kiosk-dark .kiosk-bottombar {
+  border-color: rgba(255, 255, 255, .12);
+}
+
+.kiosk-dark .badge-st {
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+}
+
+.kiosk-tile {
+  border-radius: var(--r-card-lg);
+  padding: 34px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.kiosk-tile-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.kiosk-tile-secondary {
+  background: #2a241c;
+  color: #fff;
+}
+
+.kiosk-tile .kiosk-tile-shape {
+  width: 42px;
+  height: 42px;
+  margin-bottom: auto;
+}
+
+.kiosk-tile-primary .kiosk-tile-shape {
+  border-radius: 50%;
+  background: rgba(23, 19, 14, .18);
+  border: 3px solid var(--accent-ink);
+}
+
+.kiosk-tile-secondary .kiosk-tile-shape {
+  border-radius: 6px;
+  border: 3px solid #fff;
+}
+
+.kiosk-tile-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  margin: 18px 0 6px;
+}
+
+.kiosk-tile-desc {
+  font-size: 16px;
+  margin: 0;
+  opacity: .85;
+}
+
+.kiosk-tile-disabled {
+  opacity: .5;
+}
+
+.kiosk-pending-pill {
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  align-self: flex-end;
+}
+
+/* Kiosque : écrans de confirmation (K4, K5, déclaration de cachet) */
+.kiosk-confirm-shell {
+  min-height: 100vh;
+  background: var(--page-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-progress {
+  height: 6px;
+  background: var(--accent);
+  animation: kiosk-progress-shrink linear forwards;
+}
+
+@keyframes kiosk-progress-shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.kiosk-progress-4s { animation-duration: 4s; }
+.kiosk-progress-5s { animation-duration: 5s; }
+
+.kiosk-confirm-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 28px;
+}
+
+.kiosk-confirm-icon.is-error {
+  background: var(--danger);
+}
+
+.kiosk-confirm-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  display: flex;
+  max-width: 420px;
+  margin: 24px auto 0;
+  overflow: hidden;
+}
+
+.kiosk-confirm-card > div {
+  flex: 1;
+  padding: 20px 26px;
+}
+
+.kiosk-confirm-card > div + div {
+  border-left: 1px solid var(--border);
+}
+
+.kiosk-cachet-row {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 22px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.kiosk-cachet-row.is-declared {
+  background: var(--surface-muted);
+}
+
+.kiosk-confirm-panel {
+  max-width: 460px;
+  width: 100%;
+}
+
+.kiosk-confirm-card .time {
+  font-size: 28px;
+}
+
+.kiosk-title-sm { font-size: 36px; }
+.kiosk-cachet-title { font-weight: 700; font-size: 20px; margin-bottom: 4px; }
+.kiosk-cachet-amount { font-size: 22px; }
