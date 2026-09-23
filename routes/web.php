@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
 use App\Http\Controllers\Admin\PrestationController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
+use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
 use App\Http\Controllers\ProfileController;
@@ -81,6 +82,9 @@ Route::prefix('kiosque')->name('kiosque.')->group(function () {
         ->name('identifier');
     Route::get('menu', [IdentificationController::class, 'menu'])->name('menu');
     Route::post('pointer', [KiosquePointageController::class, 'store'])->name('pointer');
+
+    Route::get('cachets', [KiosqueCachetController::class, 'index'])->name('cachets.index');
+    Route::post('cachets/{cachet}/declarer', [KiosqueCachetController::class, 'declarer'])->name('cachets.declarer');
 });
 
 require __DIR__.'/auth.php';
