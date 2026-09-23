@@ -46,6 +46,19 @@
                                 <button type="submit">Corriger</button>
                             </form>
                         @endunless
+
+                        @if ($cachet->statut->value === 'validee_payee')
+                            @if ($cachet->depense_creee_at)
+                                <p>Dépense créée dans Caisse CAFAB.</p>
+                            @else
+                                <p>Dépense non créée : {{ $cachet->depense_erreur }}</p>
+                                <form action="{{ route('admin.cachets.reessayer-depense', $cachet) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit">Réessayer</button>
+                                </form>
+                            @endif
+                        @endif
                     </td>
                 </tr>
             @endforeach

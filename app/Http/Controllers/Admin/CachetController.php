@@ -51,4 +51,15 @@ class CachetController extends Controller
 
         return redirect()->route('admin.prestations.show', $cachet->prestation_id)->with('message', 'Montant ajusté.');
     }
+
+    public function reessayerDepense(Cachet $cachet, CachetService $service): RedirectResponse
+    {
+        try {
+            $service->reessayerDepense($cachet);
+        } catch (CachetException $e) {
+            return redirect()->route('admin.prestations.show', $cachet->prestation_id)->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.prestations.show', $cachet->prestation_id)->with('message', 'Dépense créée.');
+    }
 }
