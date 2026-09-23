@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatutCachet;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,5 +53,27 @@ class Cachet extends Model
     public function estFinalise(): bool
     {
         return in_array($this->statut, [StatutCachet::ValideePayee, StatutCachet::Annule], true);
+    }
+
+    public function scopeValidees(Builder $query): void
+    {
+        $query->where('statut', StatutCachet::ValideePayee);
+    }
+
+    public function scopeEntrePeriode(Builder $query, ?string $dateDebut, ?string $dateFin): void
+    {
+        if ($dateDebut) {
+            $query->whereDate('validee_at', '>=', $dateDebut);
+        }
+        if ($dateFin) {
+            $query->whereDate('validee_at', '<=', $dateFin);
+        }
+    }
+
+    public function scopePourFille(Builder $query, ?int $filleId): void
+    {
+        if ($filleId) {
+            $query->where('fille_id', $filleId);
+        }
     }
 }
