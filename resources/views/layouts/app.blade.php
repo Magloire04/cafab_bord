@@ -22,6 +22,14 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+                    <div class="bg-red-100 border border-red-300 text-red-800 rounded-md px-4 py-3">
+                        {{ session('error') }}
+                    </div>
+                </div>
+            @endif
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">

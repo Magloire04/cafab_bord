@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CachetController as AdminCachetController;
 use App\Http\Controllers\Admin\CalendrierController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
@@ -66,6 +67,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
     Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
         ->name('prestations.annuler');
+
+    Route::patch('cachets/{cachet}/valider', [AdminCachetController::class, 'valider'])->name('cachets.valider');
+    Route::patch('cachets/{cachet}/corriger', [AdminCachetController::class, 'corriger'])->name('cachets.corriger');
+    Route::patch('cachets/{cachet}/montant', [AdminCachetController::class, 'ajusterMontant'])->name('cachets.ajuster-montant');
 });
 
 Route::middleware(['auth', 'role:coach'])->prefix('coach')->name('coach.')->group(function () {
