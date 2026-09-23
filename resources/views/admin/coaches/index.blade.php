@@ -1,48 +1,64 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Registre des coachs</h1>
+        <div>
+            <h1 class="page-title">Registre des coachs</h1>
+            <p class="field-hint mb-0">Gérez les comptes et statuts des coachs.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.coaches.create') }}" class="btn-ink">Ajouter un coach</a>
+        </div>
     </x-slot>
 
-    <a href="{{ route('admin.coaches.create') }}">Ajouter un coach</a>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Contact</th>
-                <th>PIN</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($coaches as $coach)
+    <div class="table-card">
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ $coach->user->name }}</td>
-                    <td>{{ $coach->user->email }}</td>
-                    <td>{{ $coach->contact ?? '—' }}</td>
-                    <td>{{ $coach->pin }}</td>
-                    <td>{{ $coach->statut->value }}</td>
-                    <td>
-                        <a href="{{ route('admin.coaches.edit', $coach) }}">Modifier</a>
-                        <form action="{{ route('admin.coaches.toggle-statut', $coach) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit">
-                                {{ $coach->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
-                            </button>
-                        </form>
-                        <form action="{{ route('admin.coaches.regenerate-pin', $coach) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit">Régénérer le PIN</button>
-                        </form>
-                    </td>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>PIN</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($coaches as $coach)
+                    <tr>
+                        <td>{{ $coach->user->name }}</td>
+                        <td>{{ $coach->user->email }}</td>
+                        <td>{{ $coach->contact ?? '—' }}</td>
+                        <td class="mono">{{ $coach->pin }}</td>
+                        <td>
+                            @if ($coach->statut->value === 'actif')
+                                <span class="badge-st st-heure">{{ $coach->statut->value }}</span>
+                            @else
+                                <span class="badge-st st-absent">{{ $coach->statut->value }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{{ route('admin.coaches.edit', $coach) }}" class="btn-outline btn-sm">Modifier</a>
+                                <form action="{{ route('admin.coaches.toggle-statut', $coach) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn-sm {{ $coach->statut->value === 'actif' ? 'btn-danger-outline' : 'btn-success' }}">
+                                        {{ $coach->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.coaches.regenerate-pin', $coach) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn-outline btn-sm">Régénérer le PIN</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-    {{ $coaches->links() }}
+    <div class="mt-4">
+        {{ $coaches->links() }}
+    </div>
 </x-app-layout>

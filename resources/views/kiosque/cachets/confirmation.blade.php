@@ -4,19 +4,31 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pointage — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-cafab.png') }}">
     <meta http-equiv="refresh" content="5;url={{ route('kiosque.home') }}">
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md p-6 text-center">
-        @if ($erreur ?? false)
-            <h1 class="text-2xl font-bold mb-4">{{ $nom }}, un instant.</h1>
-            <p>{{ $erreur }}</p>
-        @else
-            <h1 class="text-2xl font-bold mb-4">Merci, {{ $nom }}.</h1>
-            <p>Déclaration enregistrée.</p>
-        @endif
-        <p class="mt-6 text-sm text-gray-400">Retour à l'accueil dans quelques secondes…</p>
+<body>
+    <div class="kiosk-confirm-shell">
+        <div class="kiosk-progress kiosk-progress-5s"></div>
+
+        <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+            <div class="text-center kiosk-confirm-panel">
+                @if ($erreur ?? false)
+                    <div class="kiosk-confirm-icon is-error">!</div>
+                    <h1 class="kiosk-title mb-2">{{ $nom }}, un instant.</h1>
+                    <p class="field-hint">{{ $erreur }}</p>
+                @else
+                    <div class="kiosk-confirm-icon">✓</div>
+                    <h1 class="kiosk-title mb-2">Merci, {{ $nom }}.</h1>
+                    <p class="field-hint">Déclaration enregistrée.</p>
+                @endif
+            </div>
+        </div>
+
+        <div class="kiosk-bottombar justify-content-center">
+            <span class="field-hint mb-0">Retour à l'accueil dans quelques secondes…</span>
+        </div>
     </div>
 </body>
 </html>

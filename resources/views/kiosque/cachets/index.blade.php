@@ -3,33 +3,56 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pointage — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>Déclaration des cachets — {{ config('app.name') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-cafab.png') }}">
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md p-6 text-center">
-        <p class="text-lg mb-1">Bonsoir</p>
-        <h1 class="text-2xl font-bold mb-8">{{ $nom }}</h1>
-
-        @forelse ($cachets as $cachet)
-            <div class="mb-6 border border-gray-700 rounded p-4">
-                <p class="mb-3">{{ $cachet->prestation->titre }} — {{ $cachet->prestation->date->format('d/m/Y') }}</p>
-                <form action="{{ route('kiosque.cachets.declarer', $cachet) }}" method="POST" class="inline">
-                    @csrf
-                    <input type="hidden" name="recu" value="1">
-                    <button type="submit" class="p-4 rounded bg-emerald-600 font-bold">J'ai reçu</button>
-                </form>
-                <form action="{{ route('kiosque.cachets.declarer', $cachet) }}" method="POST" class="inline">
-                    @csrf
-                    <input type="hidden" name="recu" value="0">
-                    <button type="submit" class="p-4 rounded bg-red-700 font-bold">Je n'ai pas reçu</button>
-                </form>
+<body>
+    <div class="kiosk d-flex flex-column">
+        <div class="kiosk-topbar">
+            <div>
+                <h1 class="kiosk-title kiosk-title-sm mb-1">Tes cachets, {{ $nom }}</h1>
+                <p class="field-hint mb-0">Dis-nous si tu as reçu l'argent. Le bureau vérifiera ensuite.</p>
             </div>
-        @empty
-            <p>Aucun cachet à déclarer pour le moment.</p>
-        @endforelse
+            <a href="{{ route('kiosque.menu') }}" class="btn-outline">Terminer</a>
+        </div>
 
-        <a href="{{ route('kiosque.menu') }}" class="block mt-6 text-sm text-gray-400">Retour</a>
+        <div class="flex-grow-1 d-flex flex-column gap-3">
+            @forelse ($cachets as $cachet)
+                <div class="kiosk-cachet-row">
+                    <div>
+                        <p class="kiosk-cachet-title mb-0">{{ $cachet->prestation->titre }}</p>
+                        <p class="field-hint mb-0">{{ $cachet->prestation->lieu }} · {{ $cachet->prestation->date->translatedFormat('l j F') }}</p>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="overline mb-1">Cachet</p>
+                        <p class="fw-bold time kiosk-cachet-amount mb-0">{{ number_format((float) $cachet->montant, 0, ',', ' ') }} F</p>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <form action="{{ route('kiosque.cachets.declarer', $cachet) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="recu" value="1">
+                            <button type="submit" class="btn-kiosk-yes">J'ai reçu</button>
+                        </form>
+                        <form action="{{ route('kiosque.cachets.declarer', $cachet) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="recu" value="0">
+                            <button type="submit" class="btn-kiosk-no">Pas encore</button>
+                        </form>
+                    </div>
+                </div>
+            @empty
+                <div class="kiosk-cachet-row">
+                    <p class="field-hint mb-0">Aucun cachet à déclarer pour le moment.</p>
+                </div>
+            @endforelse
+        </div>
+
+        <div class="kiosk-bottombar">
+            <span class="field-hint mb-0">Une déclaration peut être corrigée par le bureau. En cas de doute, parles-en au coach.</span>
+        </div>
     </div>
 </body>
 </html>

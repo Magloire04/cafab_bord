@@ -4,29 +4,51 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pointage — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-cafab.png') }}">
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md p-6 text-center">
-        <p class="text-lg mb-1">Bonsoir</p>
-        <h1 class="text-3xl font-bold mb-8">{{ $nom }}</h1>
+<body>
+    <div class="kiosk kiosk-dark d-flex flex-column">
+        <div class="flex-grow-1">
+            <p class="field-hint mb-1">Bonsoir</p>
+            <h1 class="kiosk-hero mb-5">{{ $nom }}</h1>
 
-        <form action="{{ route('kiosque.pointer') }}" method="POST">
-            @csrf
-            <button type="submit" class="w-full p-6 rounded bg-orange-600 text-lg font-bold">
-                Pointer ma présence
-            </button>
-        </form>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <form action="{{ route('kiosque.pointer') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="kiosk-tile kiosk-tile-primary">
+                            <span class="kiosk-tile-shape"></span>
+                            <p class="kiosk-tile-title mb-0">Pointer ma présence</p>
+                            <p class="kiosk-tile-desc">Enregistrer ton arrivée à la répétition.</p>
+                        </button>
+                    </form>
+                </div>
 
-        @if ($cachetsEligibles ?? false)
-            <a href="{{ route('kiosque.cachets.index') }}" class="block w-full p-6 mt-4 rounded bg-emerald-600 text-lg font-bold">
-                Déclarer mon cachet
+                <div class="col-md-6">
+                    @if ($cachetsEligibles)
+                        <a href="{{ route('kiosque.cachets.index') }}" class="kiosk-tile kiosk-tile-secondary">
+                            <span class="kiosk-pending-pill">{{ $cachetsEnAttente }} en attente</span>
+                            <span class="kiosk-tile-shape"></span>
+                            <p class="kiosk-tile-title mb-0">Déclarer un cachet</p>
+                            <p class="kiosk-tile-desc">Dire si tu as reçu l'argent de tes prestations passées.</p>
+                        </a>
+                    @else
+                        <div class="kiosk-tile kiosk-tile-secondary kiosk-tile-disabled">
+                            <span class="kiosk-tile-shape"></span>
+                            <p class="kiosk-tile-title mb-0">Déclarer un cachet</p>
+                            <p class="kiosk-tile-desc">Aucun cachet à déclarer pour le moment.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <div class="kiosk-bottombar">
+            <a href="{{ route('kiosque.home') }}" class="field-hint text-decoration-none mb-0">
+                Ce n'est pas toi ? Touche ici pour revenir en arrière.
             </a>
-        @endif
-
-        <a href="{{ route('kiosque.home') }}" class="block mt-6 text-sm text-gray-400">
-            Ce n'est pas toi ? Touche ici pour revenir en arrière.
-        </a>
+        </div>
     </div>
 </body>
 </html>

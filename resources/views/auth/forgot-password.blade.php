@@ -1,25 +1,29 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <div class="logo-box">
+        <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <p class="overline mb-1">Présence &amp; paiements</p>
+    <h1 class="page-title">Mot de passe oublié</h1>
+
+    <p class="field-hint mt-2 mb-0">
+        Indique ton adresse email : nous t'enverrons un lien pour choisir un nouveau mot de passe.
+    </p>
+
+    <x-auth-session-status class="field-hint mt-2" :status="session('status')" />
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-3">
+            <label for="email" class="field-label">Email</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}"
+                class="field-control" required autofocus>
+            @error('email') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="btn-ink w-100 justify-content-center">
+            Envoyer le lien de réinitialisation
+        </button>
     </form>
 </x-guest-layout>

@@ -1,0 +1,588 @@
+/* ==========================================================================
+   Compléments à cafab-tokens.scss : ce que la maquette ne couvre pas
+   explicitement (champs de formulaire, grille du calendrier, écran de
+   connexion, pagination) mais construit avec les mêmes variables/rayons.
+   ========================================================================== */
+
+/* Sidebar : détails non couverts par cafab-tokens.scss */
+.sidebar .logo-box img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar .user-name {
+  color: var(--sidebar-strong);
+}
+
+.sidebar .user-role-logout {
+  color: var(--sidebar-text);
+  cursor: pointer;
+}
+
+.sidebar .user-role-logout:hover {
+  color: var(--sidebar-strong);
+}
+
+/* Messages flash (session 'message' / 'status' / 'error') */
+.js-flash {
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.js-flash.is-hiding {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* Champs de formulaire */
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.field-control,
+.field-select,
+textarea.field-control {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-btn);
+  padding: 11px 14px;
+  font: 500 15px var(--font-body);
+  color: var(--ink);
+}
+
+.field-control:focus,
+.field-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--danger-ink);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.field-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ink);
+}
+
+/* Carte de contenu générique (formulaires, page hub) */
+.content-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 28px 30px;
+}
+
+/* Tuile de lien (hub rapports, raccourcis dashboard) */
+.link-tile {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 22px 24px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color .15s ease;
+}
+
+.link-tile:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.link-tile .link-tile-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.link-tile .link-tile-desc {
+  color: var(--ink-3);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Écran de connexion */
+.auth-shell {
+  min-height: 100vh;
+  background: var(--page-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card-lg);
+  padding: 36px 34px;
+  text-align: center;
+}
+
+.auth-card .logo-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.auth-card .logo-box img {
+  height: 56px;
+  width: auto;
+  display: block;
+}
+
+.auth-card form {
+  text-align: left;
+  margin-top: 22px;
+}
+
+.auth-card .page-title {
+  font-size: 26px;
+}
+
+/* Calendrier mensuel (admin) */
+.calendar-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.calendar-head div {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.calendar-cell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 12px;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-cell.is-outside {
+  background: var(--surface-muted);
+  color: var(--ink-3);
+}
+
+.calendar-cell.is-today {
+  border: 2px solid var(--accent);
+}
+
+.calendar-cell .cell-day {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.calendar-pill {
+  border-radius: var(--r-btn-sm);
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calendar-pill.is-ok      { background: var(--st-heure-bg); color: var(--st-heure-fg); }
+.calendar-pill.is-warn    { background: var(--st-retard-bg); color: var(--st-retard-fg); }
+.calendar-pill.is-danger  { background: var(--st-fort-bg); color: var(--st-fort-fg); }
+.calendar-pill.is-upcoming{ background: #fff; border: 1px dashed var(--border-strong); color: var(--ink-2); }
+.calendar-pill.is-current { background: var(--st-fort-bg); color: var(--st-fort-fg); }
+
+.calendar-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0,0,0,.12);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.calendar-bar > span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+}
+
+// Classes de largeur en paliers de 5 % : la CSP de l'app (style-src 'self')
+// interdit les style="width: ...%" inline, donc la barre choisit la classe
+// la plus proche plutot qu'une valeur arbitraire.
+@for $i from 0 through 20 {
+  .w-pct-#{$i * 5} {
+    width: #{$i * 5}%;
+  }
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.calendar-legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.calendar-legend .dot.is-ok     { background: var(--st-heure-fg); }
+.calendar-legend .dot.is-warn   { background: var(--st-retard-shape); }
+.calendar-legend .dot.is-danger { background: var(--st-fort-fg); }
+.calendar-legend .dot.is-upcoming { background: transparent; border: 2px solid var(--border-strong); }
+
+/* Pagination (paginateur Laravel par défaut) */
+.pagination {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--r-btn-sm);
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pagination .active .page-link {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.pagination .disabled .page-link {
+  color: var(--ink-3);
+  border-color: var(--border);
+}
+
+/* Montants colorés dans les tableaux (paiements, rapports) : équivalent texte
+   des classes text-success/text-danger de Bootstrap, sans style inline. */
+.text-amount-ok {
+  color: var(--st-heure-fg);
+}
+
+.text-amount-warn {
+  color: var(--danger-ink);
+}
+
+/* Mobile : la sidebar passe au-dessus du contenu plutôt que sur le côté */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+  }
+
+  .sidebar .logo-box {
+    margin-bottom: 0;
+    padding: 8px;
+  }
+
+  .sidebar nav {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+
+  .sidebar .user {
+    margin-top: 0;
+    margin-left: auto;
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    padding: 20px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+}
+
+/* Kiosque : barres et zones que cafab-tokens.scss ne détaille pas */
+.kiosk-topbar,
+.kiosk-bottombar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.kiosk-topbar {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+}
+
+.kiosk-bottombar {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  margin-top: 32px;
+}
+
+.kiosk-logo {
+  height: 56px;
+  width: auto;
+}
+
+.kiosk-clock {
+  font-size: 28px;
+}
+
+.kiosk-pin-panel {
+  max-width: 480px;
+}
+
+.kiosk-subtitle {
+  font-size: 16px;
+}
+
+.kiosk-error-text {
+  font-size: 15px;
+}
+
+.pin-dot {
+  width: 64px;
+  flex: none;
+}
+
+/* Kiosque : écran sombre après identification (menu, choix de l'action) */
+.kiosk-dark {
+  background: var(--ink);
+  color: #fff;
+  min-height: 100vh;
+  padding: 40px 60px;
+}
+
+.kiosk-dark .field-hint {
+  color: var(--sidebar-text);
+}
+
+.kiosk-dark h1,
+.kiosk-dark h2,
+.kiosk-dark h3,
+.kiosk-dark .display {
+  color: #fff;
+}
+
+.kiosk-dark .kiosk-topbar,
+.kiosk-dark .kiosk-bottombar {
+  border-color: rgba(255, 255, 255, .12);
+}
+
+.kiosk-dark .badge-st {
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+}
+
+.kiosk-tile {
+  border-radius: var(--r-card-lg);
+  padding: 34px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.kiosk-tile-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.kiosk-tile-secondary {
+  background: #2a241c;
+  color: #fff;
+}
+
+.kiosk-tile .kiosk-tile-shape {
+  width: 42px;
+  height: 42px;
+  margin-bottom: auto;
+}
+
+.kiosk-tile-primary .kiosk-tile-shape {
+  border-radius: 50%;
+  background: rgba(23, 19, 14, .18);
+  border: 3px solid var(--accent-ink);
+}
+
+.kiosk-tile-secondary .kiosk-tile-shape {
+  border-radius: 6px;
+  border: 3px solid #fff;
+}
+
+.kiosk-tile-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  margin: 18px 0 6px;
+}
+
+.kiosk-tile-desc {
+  font-size: 16px;
+  margin: 0;
+  opacity: .85;
+}
+
+.kiosk-tile-disabled {
+  opacity: .5;
+}
+
+.kiosk-pending-pill {
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  align-self: flex-end;
+}
+
+/* Kiosque : écrans de confirmation (K4, K5, déclaration de cachet) */
+.kiosk-confirm-shell {
+  min-height: 100vh;
+  background: var(--page-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.kiosk-progress {
+  height: 6px;
+  background: var(--accent);
+  animation: kiosk-progress-shrink linear forwards;
+}
+
+@keyframes kiosk-progress-shrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.kiosk-progress-4s { animation-duration: 4s; }
+.kiosk-progress-5s { animation-duration: 5s; }
+
+.kiosk-confirm-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 28px;
+}
+
+.kiosk-confirm-icon.is-error {
+  background: var(--danger);
+}
+
+.kiosk-confirm-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  display: flex;
+  max-width: 420px;
+  margin: 24px auto 0;
+  overflow: hidden;
+}
+
+.kiosk-confirm-card > div {
+  flex: 1;
+  padding: 20px 26px;
+}
+
+.kiosk-confirm-card > div + div {
+  border-left: 1px solid var(--border);
+}
+
+.kiosk-cachet-row {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 22px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.kiosk-cachet-row.is-declared {
+  background: var(--surface-muted);
+}
+
+.kiosk-confirm-panel {
+  max-width: 460px;
+  width: 100%;
+}
+
+.kiosk-confirm-card .time {
+  font-size: 28px;
+}
+
+.kiosk-title-sm { font-size: 36px; }
+.kiosk-cachet-title { font-weight: 700; font-size: 20px; margin-bottom: 4px; }
+.kiosk-cachet-amount { font-size: 22px; }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kiosque;
 use App\Enums\SourcePointage;
 use App\Exceptions\PointageException;
 use App\Http\Controllers\Controller;
+use App\Models\Cachet;
 use App\Models\Fille;
 use App\Models\Seance;
 use App\Services\PointageService;
@@ -57,9 +58,12 @@ class PointageController extends Controller
             ]);
         }
 
+        $estFille = $identifie['type'] === Fille::class;
+
         return view('kiosque.confirmation', [
-            'nom' => $identifie['type'] === Fille::class ? "{$personne->prenom}" : $personne->user->name,
+            'nom' => $estFille ? "{$personne->prenom}" : $personne->user->name,
             'pointage' => $pointage,
+            'cachetsEnAttente' => $estFille ? Cachet::eligiblesDeclaration($personne->id)->count() : 0,
         ]);
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PrestationController;
 use App\Http\Controllers\Admin\RapportDepensesController;
 use App\Http\Controllers\Admin\RapportPonctualiteController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
@@ -23,9 +24,7 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

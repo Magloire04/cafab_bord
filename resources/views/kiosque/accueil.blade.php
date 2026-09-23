@@ -3,37 +3,75 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pointage — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-cafab.png') }}">
+    @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md p-6">
-        <h1 class="text-2xl font-bold mb-2">Tape ton code</h1>
-        @if ($seance)
-            <p class="mb-4">Répétition en cours — début prévu {{ \Illuminate\Support\Carbon::parse($seance->heure_prevue)->format('H:i') }}</p>
-        @else
-            <p class="mb-4">Aucune répétition en cours pour le moment.</p>
-        @endif
-
-        @error('pin')
-            <p class="text-red-600 mb-4">{{ $message }}</p>
-        @enderror
-
-        <form action="{{ route('kiosque.identifier') }}" method="POST" x-data="{ pin: '' }">
-            @csrf
-            <input type="hidden" name="pin" x-model="pin">
-            <div class="text-3xl text-center tracking-widest mb-4" x-text="pin.padEnd(4, '_')"></div>
-            <div class="grid grid-cols-3 gap-2">
-                @foreach ([1,2,3,4,5,6,7,8,9] as $chiffre)
-                    <button type="button" class="p-4 text-xl border rounded"
-                            x-on:click="if (pin.length < 4) pin += '{{ $chiffre }}'">{{ $chiffre }}</button>
-                @endforeach
-                <button type="button" class="p-4 border rounded" x-on:click="pin = ''">Effacer</button>
-                <button type="button" class="p-4 text-xl border rounded"
-                        x-on:click="if (pin.length < 4) pin += '0'">0</button>
-                <button type="submit" class="p-4 border rounded bg-black text-white" x-bind:disabled="pin.length !== 4">Valider</button>
+<body>
+    <div class="kiosk d-flex flex-column">
+        <div class="kiosk-topbar">
+            <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB" class="kiosk-logo">
+            <div class="d-flex align-items-center gap-3">
+                @if ($seance)
+                    <span class="badge-st st-fort">Séance en cours</span>
+                @endif
+                <span class="page-title kiosk-clock"
+                      x-data="{ heure: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) }"
+                      x-init="setInterval(() => heure = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}), 10000)"
+                      x-text="heure"></span>
             </div>
-        </form>
+        </div>
+
+        <div class="flex-grow-1 d-flex flex-column justify-content-center kiosk-pin-panel">
+            <h1 class="kiosk-title mb-2">Tape ton code</h1>
+            <p class="field-hint kiosk-subtitle mb-4">
+                @if ($seance)
+                    Répétition en cours — début prévu {{ \Illuminate\Support\Carbon::parse($seance->heure_prevue)->format('H:i') }}
+                @else
+                    Aucune répétition en cours pour le moment.
+                @endif
+            </p>
+
+            @error('pin')
+                <p class="field-error kiosk-error-text mb-3">{{ $message }}</p>
+            @enderror
+
+            <form action="{{ route('kiosque.identifier') }}" method="POST" x-data="{ pin: '' }">
+                @csrf
+                <input type="hidden" name="pin" x-model="pin">
+
+                <div class="d-flex gap-2 mb-4">
+                    <template x-for="i in 4" :key="i">
+                        <div class="pin-key pin-dot d-flex align-items-center justify-content-center" x-text="pin.length >= i ? '•' : ''"></div>
+                    </template>
+                </div>
+
+                <div class="row g-2">
+                    @foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9] as $chiffre)
+                        <div class="col-4">
+                            <button type="button" class="pin-key w-100" x-on:click="if (pin.length < 4) pin += '{{ $chiffre }}'">{{ $chiffre }}</button>
+                        </div>
+                    @endforeach
+                    <div class="col-4">
+                        <button type="button" class="btn-outline w-100 h-100 justify-content-center" x-on:click="pin = ''">Effacer</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="pin-key w-100" x-on:click="if (pin.length < 4) pin += '0'">0</button>
+                    </div>
+                    <div class="col-4">
+                        <button type="submit" class="btn-ink w-100 h-100 justify-content-center" x-bind:disabled="pin.length !== 4">Valider</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="kiosk-bottombar">
+            <span class="field-hint mb-0">Tu ne connais pas ton code ? Demande au coach.</span>
+            @if ($seance?->coach?->user)
+                <span class="field-hint mb-0">Coach de la séance : {{ $seance->coach->user->name }}</span>
+            @endif
+        </div>
     </div>
 </body>
 </html>

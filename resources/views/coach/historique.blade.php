@@ -1,26 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Mon historique de ponctualité</h1>
+        <div>
+            <h1 class="page-title">Mon historique de ponctualité</h1>
+        </div>
     </x-slot>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Arrivée</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($pointages as $pointage)
+    <div class="table-card mb-3">
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ $pointage->seance->date->format('d/m/Y') }}</td>
-                    <td>{{ $pointage->pointe_a?->format('H:i') ?? '—' }}</td>
-                    <td>{{ $pointage->statut_ponctualite->value }}</td>
+                    <th>Date</th>
+                    <th>Arrivée</th>
+                    <th>Statut</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse ($pointages as $pointage)
+                    @php
+                        $minutesRetard = in_array($pointage->statut_ponctualite->value, ['en_retard', 'retard_fort'])
+                            ? $pointage->minutes_retard
+                            : null;
+                    @endphp
+                    <tr>
+                        <td class="fw-bold">{{ $pointage->seance->date->format('d/m/Y') }}</td>
+                        <td class="time">{{ $pointage->pointe_a?->format('H:i') ?? '—' }}</td>
+                        <td>
+                            <x-badge-ponctualite :statut="$pointage->statut_ponctualite" :minutes="$minutesRetard" />
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center py-4 field-hint">Aucun historique de pointage pour le moment.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-    {{ $pointages->links() }}
+    @if ($pointages->hasPages())
+        <div>
+            {{ $pointages->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
 </x-app-layout>

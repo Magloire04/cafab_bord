@@ -1,26 +1,44 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Ajouter un coach</h1>
+        <div>
+            <h1 class="page-title">Ajouter un coach</h1>
+        </div>
     </x-slot>
 
-    <form action="{{ route('admin.coaches.store') }}" method="POST">
-        @csrf
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="content-card">
+                <form action="{{ route('admin.coaches.store') }}" method="POST">
+                    @csrf
 
-        <label for="name">Nom complet</label>
-        <input id="name" name="name" type="text" value="{{ old('name') }}" required>
-        @error('name') <p>{{ $message }}</p> @enderror
+                    <div class="mb-3">
+                        <label for="name" class="field-label">Nom complet</label>
+                        <input id="name" name="name" type="text" class="field-control" value="{{ old('name') }}" required>
+                        @error('name') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
 
-        <label for="email">E-mail</label>
-        <input id="email" name="email" type="email" value="{{ old('email') }}" required>
-        @error('email') <p>{{ $message }}</p> @enderror
+                    <div class="mb-3">
+                        <label for="email" class="field-label">E-mail</label>
+                        <input id="email" name="email" type="email" class="field-control" value="{{ old('email') }}" required>
+                        @error('email') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
 
-        <label for="contact">Contact</label>
-        <input id="contact" name="contact" type="text" value="{{ old('contact') }}">
+                    <div class="mb-3">
+                        <label for="contact" class="field-label">Contact</label>
+                        <input id="contact" name="contact" type="text" class="field-control" value="{{ old('contact') }}">
+                    </div>
 
-        <label for="date_entree">Date d'entrée</label>
-        <input id="date_entree" name="date_entree" type="date" value="{{ old('date_entree') }}" required>
-        @error('date_entree') <p>{{ $message }}</p> @enderror
+                    <div class="mb-4">
+                        <label for="date_entree" class="field-label">Date d'entrée</label>
+                        <input id="date_entree" name="date_entree" type="date" class="field-control" value="{{ old('date_entree') }}" required>
+                        @error('date_entree') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
 
-        <button type="submit">Créer</button>
-    </form>
+                    <div class="d-grid">
+                        <button type="submit" class="btn-ink justify-content-center">Créer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-app-layout>
