@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
 use App\Http\Controllers\Admin\PrestationController;
+use App\Http\Controllers\Admin\RapportPonctualiteController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
 use App\Http\Controllers\Kiosque\IdentificationController;
@@ -64,6 +65,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('pointages', [AdminPointageController::class, 'index'])->name('pointages.index');
     Route::patch('pointages/{pointage}/corriger', [AdminPointageController::class, 'corriger'])->name('pointages.corriger');
+
+    Route::get('rapports', function () {
+        return view('admin.rapports.index');
+    })->name('rapports.index');
+
+    Route::get('rapports/ponctualite', [RapportPonctualiteController::class, 'index'])->name('rapports.ponctualite');
+    Route::get('rapports/ponctualite/excel', [RapportPonctualiteController::class, 'excel'])->name('rapports.ponctualite.excel');
 
     Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
     Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
