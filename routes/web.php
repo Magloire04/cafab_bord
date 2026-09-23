@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CalendrierController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
+use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
 use App\Http\Controllers\Admin\PrestationController;
@@ -67,6 +68,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
     Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
         ->name('prestations.annuler');
+
+    Route::get('paiements', [PaiementController::class, 'index'])->name('paiements.index');
 
     Route::patch('cachets/{cachet}/valider', [AdminCachetController::class, 'valider'])->name('cachets.valider');
     Route::patch('cachets/{cachet}/corriger', [AdminCachetController::class, 'corriger'])->name('cachets.corriger');

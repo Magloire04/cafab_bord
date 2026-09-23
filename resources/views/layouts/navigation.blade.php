@@ -40,6 +40,10 @@
                         <x-nav-link :href="route('admin.prestations.index')" :active="request()->routeIs('admin.prestations.*')">
                             {{ __('Prestations') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.paiements.index')" :active="request()->routeIs('admin.paiements.*')">
+                            {{ __('Paiements') }}
+                        </x-nav-link>
                     @endif
 
                     @if (auth()->user()->role === \App\Enums\UserRole::Coach)
@@ -134,6 +138,10 @@
 
                 <x-responsive-nav-link :href="route('admin.prestations.index')" :active="request()->routeIs('admin.prestations.*')">
                     {{ __('Prestations') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.paiements.index')" :active="request()->routeIs('admin.paiements.*')">
+                    {{ __('Paiements') }}
                 </x-responsive-nav-link>
             @endif
 
