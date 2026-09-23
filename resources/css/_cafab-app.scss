@@ -304,6 +304,16 @@ textarea.field-control {
   border-color: var(--border);
 }
 
+/* Montants colorés dans les tableaux (paiements, rapports) : équivalent texte
+   des classes text-success/text-danger de Bootstrap, sans style inline. */
+.text-amount-ok {
+  color: var(--st-heure-fg);
+}
+
+.text-amount-warn {
+  color: var(--danger-ink);
+}
+
 /* Mobile : la sidebar passe au-dessus du contenu plutôt que sur le côté */
 @media (max-width: 900px) {
   .app {
