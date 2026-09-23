@@ -24,7 +24,7 @@
         <a href="{{ route('admin.rapports.depenses.excel', request()->query()) }}" target="_blank">Exporter en Excel</a>
     </form>
 
-    <p>Total : {{ number_format($total, 2, ',', '') }} FCFA</p>
+    <p>Total : {{ number_format($total, 2, ',', ' ') }} FCFA</p>
 
     <table>
         <thead>
@@ -44,7 +44,7 @@
                     <td>{{ $cachet->prestation->titre }}</td>
                     <td>{{ $cachet->prestation->date->format('d/m/Y') }}</td>
                     <td>{{ $cachet->fille->prenom }} {{ $cachet->fille->nom }}</td>
-                    <td>{{ number_format((float) $cachet->montant, 2, ',', '') }}</td>
+                    <td>{{ number_format((float) $cachet->montant, 2, ',', ' ') }}</td>
                     <td>{{ $cachet->caisse_cafab_reference ?? '-' }}</td>
                 </tr>
             @endforeach

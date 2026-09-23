@@ -29,7 +29,7 @@ it('lets the admin view validated cachets with prestation and fille detail', fun
         ->assertOk()
         ->assertSee('Awa Dupont')
         ->assertSee('Spectacle')
-        ->assertSeeText('5000');
+        ->assertSeeText('5 000,00');
 });
 
 it('excludes non validated cachets and shows the correct total', function () {
@@ -38,7 +38,7 @@ it('excludes non validated cachets and shows the correct total', function () {
 
     $response = $this->actingAs($this->admin)->get(route('admin.rapports.depenses'));
 
-    $response->assertOk()->assertSeeText('5000');
+    $response->assertOk()->assertSeeText('5 000,00');
     $response->assertDontSeeText('3000');
 });
 

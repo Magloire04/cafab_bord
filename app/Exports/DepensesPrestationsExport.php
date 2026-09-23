@@ -39,7 +39,7 @@ class DepensesPrestationsExport implements FromQuery, WithHeadings, WithMapping,
             $cachet->prestation->titre,
             $cachet->prestation->date->format('d/m/Y'),
             "{$cachet->fille->prenom} {$cachet->fille->nom}",
-            number_format((float) $cachet->montant, 2, ',', ''),
+            number_format((float) $cachet->montant, 2, ',', ' '),
             $cachet->caisse_cafab_reference ?? '-',
         ];
     }
