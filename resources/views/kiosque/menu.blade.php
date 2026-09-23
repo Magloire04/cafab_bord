@@ -18,6 +18,12 @@
             </button>
         </form>
 
+        @if ($cachetsEligibles ?? false)
+            <a href="{{ route('kiosque.cachets.index') }}" class="block w-full p-6 mt-4 rounded bg-emerald-600 text-lg font-bold">
+                Déclarer mon cachet
+            </a>
+        @endif
+
         <a href="{{ route('kiosque.home') }}" class="block mt-6 text-sm text-gray-400">
             Ce n'est pas toi ? Touche ici pour revenir en arrière.
         </a>

@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\CachetController as AdminCachetController;
 use App\Http\Controllers\Admin\CalendrierController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
+use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
+use App\Http\Controllers\Admin\PrestationController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
+use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
 use App\Http\Controllers\ProfileController;
@@ -60,6 +64,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('pointages', [AdminPointageController::class, 'index'])->name('pointages.index');
     Route::patch('pointages/{pointage}/corriger', [AdminPointageController::class, 'corriger'])->name('pointages.corriger');
+
+    Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
+    Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
+        ->name('prestations.annuler');
+
+    Route::get('paiements', [PaiementController::class, 'index'])->name('paiements.index');
+
+    Route::patch('cachets/{cachet}/valider', [AdminCachetController::class, 'valider'])->name('cachets.valider');
+    Route::patch('cachets/{cachet}/corriger', [AdminCachetController::class, 'corriger'])->name('cachets.corriger');
+    Route::patch('cachets/{cachet}/montant', [AdminCachetController::class, 'ajusterMontant'])->name('cachets.ajuster-montant');
+    Route::patch('cachets/{cachet}/reessayer-depense', [AdminCachetController::class, 'reessayerDepense'])
+        ->name('cachets.reessayer-depense');
 });
 
 Route::middleware(['auth', 'role:coach'])->prefix('coach')->name('coach.')->group(function () {
@@ -76,6 +92,9 @@ Route::prefix('kiosque')->name('kiosque.')->group(function () {
         ->name('identifier');
     Route::get('menu', [IdentificationController::class, 'menu'])->name('menu');
     Route::post('pointer', [KiosquePointageController::class, 'store'])->name('pointer');
+
+    Route::get('cachets', [KiosqueCachetController::class, 'index'])->name('cachets.index');
+    Route::post('cachets/{cachet}/declarer', [KiosqueCachetController::class, 'declarer'])->name('cachets.declarer');
 });
 
 require __DIR__.'/auth.php';

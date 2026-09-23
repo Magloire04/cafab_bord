@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'caisse_cafab' => [
+        'url' => env('CAISSE_CAFAB_API_URL'),
+        'token' => env('CAISSE_CAFAB_API_TOKEN'),
+    ],
+
 ];

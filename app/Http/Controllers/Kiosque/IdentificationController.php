@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Kiosque;
 
+use App\Enums\StatutCachet;
+use App\Enums\StatutPrestation;
 use App\Http\Controllers\Controller;
+use App\Models\Cachet;
 use App\Models\Fille;
 use App\Models\Seance;
 use App\Services\KioskIdentifier;
@@ -45,10 +48,20 @@ class IdentificationController extends Controller
 
     public function menu(Request $request): View|RedirectResponse
     {
-        if (! $request->session()->has('kiosque.identifie')) {
+        $identifie = $request->session()->get('kiosque.identifie');
+
+        if (! $identifie) {
             return redirect()->route('kiosque.home');
         }
 
-        return view('kiosque.menu', ['nom' => $request->session()->get('kiosque.nom')]);
+        $cachetsEligibles = $identifie['type'] === Fille::class && Cachet::where('fille_id', $identifie['id'])
+            ->whereIn('statut', [StatutCachet::Du, StatutCachet::DeclareePayee, StatutCachet::DeclareeNonPayee])
+            ->whereHas('prestation', fn ($q) => $q->where('statut', StatutPrestation::Active)->where('date', '<', today()))
+            ->exists();
+
+        return view('kiosque.menu', [
+            'nom' => $request->session()->get('kiosque.nom'),
+            'cachetsEligibles' => $cachetsEligibles,
+        ]);
     }
 }

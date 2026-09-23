@@ -1,0 +1,79 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h1>{{ $prestation->titre }}</h1>
+    </x-slot>
+
+    <p>{{ $prestation->lieu }} — {{ $prestation->date->format('d/m/Y') }} — statut : {{ $prestation->statut->value }}</p>
+
+    @if ($errors->any())
+        <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+            <div class="bg-red-100 border border-red-300 text-red-800 rounded-md px-4 py-3">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fille</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($prestation->cachets as $cachet)
+                <tr>
+                    <td>{{ $cachet->fille->prenom }} {{ $cachet->fille->nom }}</td>
+                    <td>{{ $cachet->montant }}</td>
+                    <td>{{ $cachet->statut->value }}</td>
+                    <td>
+                        @unless ($cachet->estFinalise())
+                            <form action="{{ route('admin.cachets.ajuster-montant', $cachet) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <input type="number" step="0.01" name="montant" value="{{ $cachet->montant }}">
+                                <button type="submit">Ajuster</button>
+                            </form>
+
+                            <form action="{{ route('admin.cachets.valider', $cachet) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit">Valider le paiement</button>
+                            </form>
+
+                            <form action="{{ route('admin.cachets.corriger', $cachet) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <select name="statut">
+                                    <option value="declaree_payee">Corriger en : déclarée payée</option>
+                                    <option value="declaree_non_payee">Corriger en : déclarée non payée</option>
+                                </select>
+                                <input type="text" name="motif" placeholder="Motif de la correction (obligatoire)" required minlength="5">
+                                <button type="submit">Corriger</button>
+                            </form>
+                        @endunless
+
+                        @if ($cachet->statut->value === 'validee_payee')
+                            @if ($cachet->depense_creee_at)
+                                <p>Dépense créée dans Caisse CAFAB.</p>
+                            @else
+                                <p>Dépense non créée : {{ $cachet->depense_erreur }}</p>
+                                <form action="{{ route('admin.cachets.reessayer-depense', $cachet) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit">Réessayer</button>
+                                </form>
+                            @endif
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</x-app-layout>
