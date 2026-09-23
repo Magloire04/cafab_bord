@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\FilleController;
 use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
+use App\Http\Controllers\Admin\PrestationController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
@@ -60,6 +61,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('pointages', [AdminPointageController::class, 'index'])->name('pointages.index');
     Route::patch('pointages/{pointage}/corriger', [AdminPointageController::class, 'corriger'])->name('pointages.corriger');
+
+    Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
+    Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
+        ->name('prestations.annuler');
 });
 
 Route::middleware(['auth', 'role:coach'])->prefix('coach')->name('coach.')->group(function () {
