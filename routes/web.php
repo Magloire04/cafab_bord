@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\PaiementController;
 use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
 use App\Http\Controllers\Admin\PrestationController;
+use App\Http\Controllers\Admin\RapportDepensesController;
 use App\Http\Controllers\Admin\RapportPonctualiteController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
@@ -72,6 +73,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('rapports/ponctualite', [RapportPonctualiteController::class, 'index'])->name('rapports.ponctualite');
     Route::get('rapports/ponctualite/excel', [RapportPonctualiteController::class, 'excel'])->name('rapports.ponctualite.excel');
+
+    Route::get('rapports/depenses', [RapportDepensesController::class, 'index'])->name('rapports.depenses');
+    Route::get('rapports/depenses/excel', [RapportDepensesController::class, 'excel'])->name('rapports.depenses.excel');
 
     Route::resource('prestations', PrestationController::class)->only(['index', 'create', 'store', 'show']);
     Route::patch('prestations/{prestation}/annuler', [PrestationController::class, 'annuler'])
