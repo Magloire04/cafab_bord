@@ -22,6 +22,7 @@ class RapportDepensesController extends Controller
             ->pourFille($filtres['fille_id'])
             ->with(['prestation', 'fille'])
             ->orderByDesc('validee_at')
+            ->orderByDesc('id')
             ->get();
 
         return view('admin.rapports.depenses', [

@@ -24,7 +24,8 @@ class DepensesPrestationsExport implements FromQuery, WithHeadings, WithMapping,
             ->entrePeriode($this->filtres['date_debut'], $this->filtres['date_fin'])
             ->pourFille($this->filtres['fille_id'])
             ->with(['prestation', 'fille'])
-            ->orderByDesc('validee_at');
+            ->orderByDesc('validee_at')
+            ->orderByDesc('id');
     }
 
     public function headings(): array

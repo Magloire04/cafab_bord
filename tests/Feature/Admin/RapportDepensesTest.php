@@ -39,7 +39,7 @@ it('excludes non validated cachets and shows the correct total', function () {
     $response = $this->actingAs($this->admin)->get(route('admin.rapports.depenses'));
 
     $response->assertOk()->assertSeeText('5 000,00');
-    $response->assertDontSeeText('3000');
+    $response->assertDontSeeText('3 000,00');
 });
 
 it('filters by period and by fille', function () {
