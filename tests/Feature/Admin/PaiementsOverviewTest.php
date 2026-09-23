@@ -26,9 +26,9 @@ it('shows the total due, paid, and remaining per prestation', function () {
 
     $response->assertOk();
     $response->assertSee('Spectacle');
-    $response->assertSeeText('8000');
-    $response->assertSeeText('5000');
-    $response->assertSeeText('3000');
+    $response->assertSeeText('8 000,00');
+    $response->assertSeeText('5 000,00');
+    $response->assertSeeText('3 000,00');
 });
 
 it('excludes annule cachets from the totals', function () {
@@ -63,4 +63,21 @@ it('filters by fille', function () {
     $response = $this->actingAs($this->admin)->get(route('admin.paiements.index', ['fille_id' => $fille->id]));
 
     $response->assertSee('Avec la fille')->assertDontSee('Sans la fille');
+});
+
+it('rejects a malformed date_debut instead of 500ing', function () {
+    $this->actingAs($this->admin)->get(route('admin.paiements.index', ['date_debut' => 'abc']))
+        ->assertSessionHasErrors('date_debut');
+});
+
+it('rejects an array date_debut instead of 500ing', function () {
+    $this->actingAs($this->admin)->get(route('admin.paiements.index').'?date_debut[]=x')
+        ->assertSessionHasErrors('date_debut');
+});
+
+it('rejects a date_fin earlier than date_debut', function () {
+    $this->actingAs($this->admin)->get(route('admin.paiements.index', [
+        'date_debut' => '2026-09-15',
+        'date_fin' => '2026-09-01',
+    ]))->assertSessionHasErrors('date_fin');
 });

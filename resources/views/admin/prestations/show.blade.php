@@ -5,6 +5,18 @@
 
     <p>{{ $prestation->lieu }} — {{ $prestation->date->format('d/m/Y') }} — statut : {{ $prestation->statut->value }}</p>
 
+    @if ($errors->any())
+        <div class="max-w-7xl mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+            <div class="bg-red-100 border border-red-300 text-red-800 rounded-md px-4 py-3">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
     <table>
         <thead>
             <tr>
@@ -42,7 +54,7 @@
                                     <option value="declaree_payee">Corriger en : déclarée payée</option>
                                     <option value="declaree_non_payee">Corriger en : déclarée non payée</option>
                                 </select>
-                                <input type="text" name="motif" placeholder="Motif de la correction (obligatoire)">
+                                <input type="text" name="motif" placeholder="Motif de la correction (obligatoire)" required minlength="5">
                                 <button type="submit">Corriger</button>
                             </form>
                         @endunless

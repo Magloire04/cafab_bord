@@ -10,6 +10,7 @@ use App\Models\Cachet;
 use App\Models\Fille;
 use App\Models\Prestation;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PrestationController extends Controller
@@ -30,23 +31,25 @@ class PrestationController extends Controller
 
     public function store(StorePrestationRequest $request): RedirectResponse
     {
-        $prestation = Prestation::create([
-            'titre' => $request->validated('titre'),
-            'lieu' => $request->validated('lieu'),
-            'date' => $request->validated('date'),
-            'montant_defaut' => $request->validated('montant_defaut'),
-        ]);
-
-        $montants = $request->validated('montants') ?? [];
-
-        foreach ($request->validated('fille_ids') as $filleId) {
-            Cachet::create([
-                'prestation_id' => $prestation->id,
-                'fille_id' => $filleId,
-                'montant' => $montants[$filleId] ?? $request->validated('montant_defaut'),
-                'statut' => StatutCachet::Du,
+        DB::transaction(function () use ($request) {
+            $prestation = Prestation::create([
+                'titre' => $request->validated('titre'),
+                'lieu' => $request->validated('lieu'),
+                'date' => $request->validated('date'),
+                'montant_defaut' => $request->validated('montant_defaut'),
             ]);
-        }
+
+            $montants = $request->validated('montants') ?? [];
+
+            foreach ($request->validated('fille_ids') as $filleId) {
+                Cachet::create([
+                    'prestation_id' => $prestation->id,
+                    'fille_id' => $filleId,
+                    'montant' => $montants[$filleId] ?? $request->validated('montant_defaut'),
+                    'statut' => StatutCachet::Du,
+                ]);
+            }
+        });
 
         return redirect()->route('admin.prestations.index')->with('message', 'Prestation créée.');
     }

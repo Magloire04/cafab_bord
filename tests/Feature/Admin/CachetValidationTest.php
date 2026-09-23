@@ -4,6 +4,8 @@ use App\Enums\StatutCachet;
 use App\Enums\UserRole;
 use App\Models\Cachet;
 use App\Models\User;
+use App\Services\CaisseCafabClient;
+use Mockery;
 
 beforeEach(function () {
     $this->admin = User::factory()->create(['role' => UserRole::Admin]);
@@ -61,4 +63,25 @@ it('lets the admin adjust the montant before validation', function () {
         ->assertRedirect(route('admin.prestations.show', $cachet->prestation_id));
 
     expect($cachet->fresh()->montant)->toBe('7500.00');
+});
+
+it('blocks a coach from retrying the depense creation', function () {
+    $coach = User::factory()->create(['role' => UserRole::Coach]);
+    $cachet = Cachet::factory()->create(['statut' => StatutCachet::ValideePayee, 'depense_creee_at' => null]);
+
+    $this->actingAs($coach)->patch(route('admin.cachets.reessayer-depense', $cachet))->assertForbidden();
+});
+
+it('lets the admin retry the depense creation without a 500', function () {
+    $cachet = Cachet::factory()->create(['statut' => StatutCachet::ValideePayee, 'depense_creee_at' => null]);
+
+    $client = Mockery::mock(CaisseCafabClient::class);
+    $client->shouldReceive('creerDepense')->once()->andReturn('cachet-'.$cachet->id);
+    $this->app->instance(CaisseCafabClient::class, $client);
+
+    $this->actingAs($this->admin)->patch(route('admin.cachets.reessayer-depense', $cachet))
+        ->assertRedirect(route('admin.prestations.show', $cachet->prestation_id))
+        ->assertSessionHas('message');
+
+    expect($cachet->fresh()->depense_creee_at)->not->toBeNull();
 });

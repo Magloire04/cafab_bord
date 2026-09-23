@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Enums\StatutCachet;
 use App\Exceptions\CachetException;
-use App\Exceptions\CaisseCafabException;
 use App\Models\Cachet;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class CachetService
 {
@@ -94,7 +94,12 @@ class CachetService
                 'caisse_cafab_reference' => $reference,
                 'depense_erreur' => null,
             ]);
-        } catch (CaisseCafabException $e) {
+        } catch (\Throwable $e) {
+            Log::error('Échec de la création de la dépense Caisse CAFAB pour le cachet.', [
+                'cachet_id' => $cachet->id,
+                'exception' => $e,
+            ]);
+
             $cachet->update(['depense_erreur' => $e->getMessage()]);
         }
     }

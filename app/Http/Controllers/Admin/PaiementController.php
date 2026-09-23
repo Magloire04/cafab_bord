@@ -13,6 +13,12 @@ class PaiementController extends Controller
 {
     public function index(Request $request): View
     {
+        $request->validate([
+            'date_debut' => ['nullable', 'date'],
+            'date_fin' => ['nullable', 'date', 'after_or_equal:date_debut'],
+            'fille_id' => ['nullable', 'integer', 'exists:filles,id'],
+        ]);
+
         $query = Prestation::with(['cachets' => fn ($q) => $q->where('statut', '!=', StatutCachet::Annule)])
             ->orderByDesc('date');
 

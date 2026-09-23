@@ -38,9 +38,9 @@
                 <tr>
                     <td>{{ $ligne['prestation']->titre }}</td>
                     <td>{{ $ligne['prestation']->date->format('d/m/Y') }}</td>
-                    <td>{{ (int) $ligne['total_du'] }}</td>
-                    <td>{{ (int) $ligne['total_paye'] }}</td>
-                    <td>{{ (int) $ligne['reste_a_payer'] }}</td>
+                    <td>{{ number_format($ligne['total_du'], 2, ',', ' ') }}</td>
+                    <td>{{ number_format($ligne['total_paye'], 2, ',', ' ') }}</td>
+                    <td>{{ number_format($ligne['reste_a_payer'], 2, ',', ' ') }}</td>
                 </tr>
             @endforeach
         </tbody>

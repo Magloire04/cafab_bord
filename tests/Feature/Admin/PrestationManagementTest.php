@@ -46,6 +46,28 @@ it('lets the admin create a prestation and affect filles with per-fille montant 
     expect(Cachet::where('prestation_id', $prestation->id)->first()->statut)->toBe(StatutCachet::Du);
 });
 
+it('rolls back the whole prestation when fille_ids contains a duplicate', function () {
+    $fille = Fille::factory()->create();
+
+    $this->withoutExceptionHandling();
+
+    try {
+        $this->actingAs($this->admin)->post(route('admin.prestations.store'), [
+            'titre' => 'Doublon',
+            'lieu' => 'Palais des Congrès',
+            'date' => now()->addWeek()->toDateString(),
+            'montant_defaut' => 5000,
+            'fille_ids' => [$fille->id, $fille->id],
+        ]);
+    } catch (Throwable $e) {
+        // A duplicate fille_id is expected to throw (no dedupe validation); the point of this
+        // test is that the transaction leaves no partial data behind, not the exception itself.
+    }
+
+    expect(Prestation::where('titre', 'Doublon')->exists())->toBeFalse();
+    expect(Cachet::where('fille_id', $fille->id)->exists())->toBeFalse();
+});
+
 it('lets the admin view a prestation with its cachets', function () {
     $prestation = Prestation::factory()->create();
     Cachet::factory()->create(['prestation_id' => $prestation->id]);
