@@ -20,7 +20,7 @@ it('lists only past, non-finalised cachets for the identified fille', function (
     $future = Prestation::factory()->create(['date' => '2026-09-24']);
     $passee2 = Prestation::factory()->create(['date' => '2026-09-21']);
 
-    $eligible = Cachet::factory()->create(['prestation_id' => $passee->id, 'fille_id' => $fille->id, 'statut' => StatutCachet::Du]);
+    Cachet::factory()->create(['prestation_id' => $passee->id, 'fille_id' => $fille->id, 'statut' => StatutCachet::Du]);
     Cachet::factory()->create(['prestation_id' => $future->id, 'fille_id' => $fille->id, 'statut' => StatutCachet::Du]);
     Cachet::factory()->create(['prestation_id' => $passee2->id, 'fille_id' => $fille->id, 'statut' => StatutCachet::ValideePayee]);
 
@@ -30,7 +30,8 @@ it('lists only past, non-finalised cachets for the identified fille', function (
     ])->get(route('kiosque.cachets.index'))
         ->assertOk()
         ->assertSee($passee->titre)
-        ->assertDontSee($future->titre);
+        ->assertDontSee($future->titre)
+        ->assertDontSee($passee2->titre);
 });
 
 it('redirects to the menu when nobody is identified', function () {
