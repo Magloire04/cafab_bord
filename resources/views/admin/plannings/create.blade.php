@@ -1,35 +1,53 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Ajouter un créneau récurrent</h1>
+        <h2 class="fw-bold mb-0">Ajouter un créneau récurrent</h2>
     </x-slot>
 
-    <form action="{{ route('admin.plannings.store') }}" method="POST">
-        @csrf
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <form action="{{ route('admin.plannings.store') }}" method="POST">
+                        @csrf
 
-        <label for="jour_semaine">Jour</label>
-        <select id="jour_semaine" name="jour_semaine" required>
-            @foreach (\App\Enums\JourSemaine::cases() as $jour)
-                <option value="{{ $jour->value }}" {{ old('jour_semaine') == $jour->value ? 'selected' : '' }}>
-                    {{ $jour->libelle() }}
-                </option>
-            @endforeach
-        </select>
-        @error('jour_semaine') <p>{{ $message }}</p> @enderror
+                        <div class="mb-3">
+                            <label for="jour_semaine" class="form-label fw-bold">Jour</label>
+                            <select id="jour_semaine" name="jour_semaine" class="form-select" required>
+                                @foreach (\App\Enums\JourSemaine::cases() as $jour)
+                                    <option value="{{ $jour->value }}" {{ old('jour_semaine') == $jour->value ? 'selected' : '' }}>
+                                        {{ $jour->libelle() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('jour_semaine') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-        <label for="heure_debut">Heure de début</label>
-        <input id="heure_debut" name="heure_debut" type="time" value="{{ old('heure_debut', '17:00') }}" required>
-        @error('heure_debut') <p>{{ $message }}</p> @enderror
+                        <div class="mb-3">
+                            <label for="heure_debut" class="form-label fw-bold">Heure de début</label>
+                            <input id="heure_debut" name="heure_debut" type="time" class="form-control" value="{{ old('heure_debut', '17:00') }}" required>
+                            @error('heure_debut') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-        <label for="coach_id">Coach référent</label>
-        <select id="coach_id" name="coach_id" required>
-            @foreach ($coaches as $coach)
-                <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
-                    {{ $coach->user->name }}
-                </option>
-            @endforeach
-        </select>
-        @error('coach_id') <p>{{ $message }}</p> @enderror
+                        <div class="mb-4">
+                            <label for="coach_id" class="form-label fw-bold">Coach référent</label>
+                            <select id="coach_id" name="coach_id" class="form-select" required>
+                                @foreach ($coaches as $coach)
+                                    <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
+                                        {{ $coach->user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('coach_id') <p class="text-danger small mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-        <button type="submit">Créer</button>
-    </form>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Créer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-app-layout>

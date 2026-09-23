@@ -55,4 +55,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(Coach::class);
     }
+
+    public function initials(): string
+    {
+        return collect(explode(' ', $this->name))
+            ->filter()
+            ->map(fn (string $word) => mb_strtoupper(mb_substr($word, 0, 1)))
+            ->take(2)
+            ->join('');
+    }
 }

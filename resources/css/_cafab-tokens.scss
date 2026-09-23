@@ -1,0 +1,148 @@
+/* ==========================================================================
+   CAFAB · Présence & Paiements — design tokens
+   Copié tel quel depuis documentations/maquette-cafab/cafab-tokens.css
+   (source de vérité du style, voir documentations/maquette-cafab/DESIGN.md).
+   Les polices sont chargées via @fontsource (voir app.scss), pas via le
+   lien Google Fonts d'origine : la CSP de l'app (style-src 'self') interdit
+   les feuilles de style/polices chargées depuis un domaine externe.
+   ========================================================================== */
+:root {
+  /* Typo */
+  --font-body: "Archivo", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Archivo", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Surfaces */
+  --page-bg:        #f0eae1;
+  --surface:        #ffffff;
+  --surface-warm:   #fdfaf4;
+  --surface-muted:  #f5efe7;
+  --border:         #ddd6cd;
+  --border-strong:  #c3bdb3;
+
+  /* Texte */
+  --ink:            #17130e;
+  --ink-2:          #5b544c;
+  --ink-3:          #69625a;
+
+  /* Sidebar sombre (coach / admin) */
+  --sidebar-bg:     #17130e;
+  --sidebar-text:   #bcb7af;
+  --sidebar-strong: #dcd7cf;
+
+  /* Accent marque (terracotta) */
+  --accent:         #cd632d;
+  --accent-ink:     #100a07;
+
+  /* Action positive */
+  --success:        #00713e;
+  --danger:         #b23b1d;
+  --danger-ink:     #892408;
+
+  /* Bandeau info (bleu) */
+  --info-bg:        #dee8fd;
+  --info-ink:       #274387;
+
+  /* ----- Statuts ponctualité ----- (pastille : fond / texte / forme) */
+  --st-heure-bg: #d7f4e0;  --st-heure-fg: #004c24;
+  --st-retard-bg:#fee8c6;  --st-retard-fg:#6e3700;  --st-retard-shape:#b6770b;
+  --st-fort-bg:  #ffddd0;  --st-fort-fg:  #892408;
+  --st-absent-bg:#e4e1dd;  --st-absent-fg:#4c4741;
+
+  /* ----- Statuts paiement cachet ----- */
+  --pay-du-bg:        #dde8ff; --pay-du-fg:        #274387;
+  --pay-decl-ok-bg:   #d5f2f1; --pay-decl-ok-fg:   #004e53;
+  --pay-decl-no-bg:   #ffddd0; --pay-decl-no-fg:   #892408;
+  --pay-valide-bg:    #00723b; --pay-valide-fg:    #ffffff;
+  --pay-corrige-bg:   #f0e1fc; --pay-corrige-fg:   #5d2e7b;
+
+  /* Rayons */
+  --r-pill: 999px;
+  --r-btn: 10px;
+  --r-btn-sm: 8px;
+  --r-card: 14px;
+  --r-card-lg: 20px;
+  --r-kiosk-btn: 16px;
+
+  /* Ombres */
+  --shadow-frame: 0 34px 70px -24px rgba(28, 20, 12, .32);
+  --shadow-accent: 0 6px 18px -8px rgba(205, 99, 45, .6);
+}
+
+/* Base */
+body { margin: 0; background: var(--page-bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; }
+h1, h2, h3, .display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.page-title   { font-size: 32px; margin: 0; }
+.kiosk-title  { font-size: 52px; }
+.kiosk-hero   { font-size: 66px; letter-spacing: -0.025em; }
+.section-title{ font-family: var(--font-display); font-weight: 800; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; }
+.overline     { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.mono         { font-family: var(--font-mono); font-size: 12px; }
+
+/* Layout poste coach / admin : sidebar noire + contenu crème */
+.app          { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.sidebar      { background: var(--sidebar-bg); color: var(--sidebar-strong); padding: 26px 20px; display: flex; flex-direction: column; }
+.sidebar .logo-box { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 28px; }
+.sidebar .nav-link { display: block; padding: 12px 14px; border-radius: var(--r-btn); color: var(--sidebar-text); font-size: 15px; text-decoration: none; }
+.sidebar .nav-link:hover { color: var(--sidebar-strong); }
+.sidebar .nav-link.active { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.sidebar .user { margin-top: auto; border-top: 1px solid rgba(255,255,255,.12); padding-top: 18px; display: flex; gap: 10px; align-items: center; }
+.avatar       { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 13px; display: grid; place-items: center; flex: none; }
+.avatar-soft  { width: 26px; height: 26px; border-radius: 50%; background: #f3e3d8; color: #892408; font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+.main         { background: var(--surface-warm); }
+.page-header  { background: var(--surface); padding: 26px 34px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+
+/* Cartes KPI */
+.kpi          { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 12px 20px; }
+.kpi .label   { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.kpi .value   { font-family: var(--font-display); font-weight: 800; font-size: 29px; }
+.kpi .value.ok { color: var(--st-heure-fg); } .kpi .value.warn { color: var(--st-retard-shape); }
+.kpi.kpi-ink  { background: var(--ink); border-color: var(--ink); }
+.kpi.kpi-ink .label { color: var(--sidebar-text); }
+.kpi.kpi-ink .value { color: #fff; }
+
+/* Tableau */
+.table-card   { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); overflow: hidden; }
+.table-card table { width: 100%; border-collapse: collapse; }
+.table-card th { background: var(--surface-muted); color: var(--ink-3); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-align: left; padding: 12px 22px; }
+.table-card td { padding: 9px 22px; border-top: 1px solid var(--border); font-size: 15px; vertical-align: middle; }
+.table-card tr.pending td { background: var(--surface-warm); }
+.time         { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Boutons */
+.btn-ink      { background: var(--ink); color: #fff; border: 0; border-radius: var(--r-btn); padding: 12px 20px; font: 600 15px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.btn-ink:hover{ opacity: .92; color: #fff; }
+.btn-outline  { background: #fff; color: var(--ink); border: 1px solid var(--border-strong); border-radius: var(--r-btn); padding: 11px 16px; font: 600 14px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.btn-outline:hover { border-color: var(--ink-3); color: var(--ink); }
+.btn-success  { background: var(--success); color: #fff; border: 0; border-radius: var(--r-btn-sm); padding: 7px 14px; font: 600 13px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn-success:hover { opacity: .92; color: #fff; }
+.btn-danger-outline { background: #fff; color: var(--danger-ink); border: 2px solid var(--danger); border-radius: var(--r-btn-sm); padding: 6px 13px; font: 600 13px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn-danger-outline:hover { background: #fff5f2; color: var(--danger-ink); }
+.btn-corrige  { background: #fff; color: #5d2e7b; border: 1px solid #d9c3ea; border-radius: var(--r-btn-sm); padding: 6px 13px; font: 600 13px var(--font-body); cursor: pointer; }
+.btn-sm       { border-radius: 9px; padding: 8px 16px; font-size: 14px; }
+button.btn-ink:disabled, button.btn-outline:disabled, button.btn-success:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Bandeaux */
+.callout-info    { background: var(--info-bg); color: var(--info-ink); border-radius: var(--r-card); padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.callout-success { background: var(--st-heure-bg); color: var(--st-heure-fg); border-radius: var(--r-card); padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.callout-danger  { background: var(--st-fort-bg); color: var(--st-fort-fg); border-radius: var(--r-card); padding: 18px 26px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+/* Pastilles de statut (toujours : forme + libellé, jamais la couleur seule) */
+.badge-st     { display: inline-flex; align-items: center; gap: 8px; border-radius: var(--r-pill); padding: 5px 12px; font: 600 13px var(--font-body); white-space: nowrap; }
+.badge-st::before { content: ""; width: 9px; height: 9px; flex: none; background: currentColor; }
+.st-heure     { background: var(--st-heure-bg);  color: var(--st-heure-fg); }  .st-heure::before  { border-radius: 50%; }
+.st-retard    { background: var(--st-retard-bg); color: var(--st-retard-fg); } .st-retard::before { background: var(--st-retard-shape); border-radius: 1px; }
+.st-fort      { background: var(--st-fort-bg);   color: var(--st-fort-fg); }   .st-fort::before   { width: 11px; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.st-absent    { background: var(--st-absent-bg); color: var(--st-absent-fg); } .st-absent::before { background: transparent; border: 2px solid currentColor; border-radius: 50%; }
+.pay-du       { background: var(--pay-du-bg);      color: var(--pay-du-fg); }      .pay-du::before      { border-radius: 50%; }
+.pay-decl-ok  { background: var(--pay-decl-ok-bg); color: var(--pay-decl-ok-fg); } .pay-decl-ok::before { background: transparent; border: 2px solid currentColor; border-radius: 50%; }
+.pay-decl-no  { background: var(--pay-decl-no-bg); color: var(--pay-decl-no-fg); } .pay-decl-no::before { background: transparent; border: 2px solid currentColor; border-radius: 50%; }
+.pay-valide   { background: var(--pay-valide-bg);  color: var(--pay-valide-fg); }  .pay-valide::before  { border-radius: 2px; }
+.pay-corrige  { background: var(--pay-corrige-bg); color: var(--pay-corrige-fg); } .pay-corrige::before { transform: rotate(45deg) scale(.85); border-radius: 1px; }
+
+/* Kiosque tablette (écrans plein cadre, tactile) */
+.kiosk        { background: var(--page-bg); min-height: 100vh; padding: 40px 60px; }
+.pin-key      { background: #fff; border: 1px solid #dfd9d0; border-radius: var(--r-btn); font: 700 28px var(--font-display); height: 76px; }
+.kiosk-card   { background: #fff; border: 1px solid #ddd5cb; border-radius: var(--r-card-lg); padding: 26px 30px; }
+.btn-kiosk-yes{ background: var(--success); color: #fff; border: 0; border-radius: var(--r-kiosk-btn); padding: 20px 30px; font: 700 22px var(--font-body); cursor: pointer; }
+.btn-kiosk-no { background: #fff; color: var(--danger-ink); border: 2px solid var(--danger); border-radius: var(--r-kiosk-btn); padding: 20px 30px; font: 700 22px var(--font-body); cursor: pointer; }

@@ -1,18 +1,22 @@
-@import "@fontsource/outfit/400.css";
-@import "@fontsource/outfit/500.css";
-@import "@fontsource/outfit/600.css";
-@import "@fontsource/outfit/700.css";
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/500.css";
+@import "@fontsource/archivo/600.css";
+@import "@fontsource/archivo/700.css";
+@import "@fontsource/bricolage-grotesque/600.css";
+@import "@fontsource/bricolage-grotesque/800.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
 
+// Bootstrap n'est utilisé ici que pour ses classes utilitaires de mise en
+// page (grille, flex, spacing) : aucun composant Bootstrap themé (.btn,
+// .card, .table, .form-control...) n'est utilisé dans les vues — l'identite
+// visuelle vient entierement de cafab-tokens (voir documentations/maquette-cafab/DESIGN.md).
 @import "bootstrap/scss/bootstrap";
 
-// Sass fusionne tous les partials en un seul fichier avant que Vite ne
-// reecrive les url() d'assets : le chemin relatif doit donc etre correct
-// depuis CE fichier (resources/css/app.scss), pas depuis le partial
-// fontawesome d'origine (qui utilise "../webfonts" par defaut).
 $fa-font-path: "../../node_modules/@fortawesome/fontawesome-free/webfonts";
 @import "@fortawesome/fontawesome-free/scss/fontawesome";
 @import "@fortawesome/fontawesome-free/scss/solid";
 @import "@fortawesome/fontawesome-free/scss/regular";
 
-@import "aos/dist/aos.css";
-@import "cafab-theme";
+@import "cafab-tokens";
+@import "cafab-app";

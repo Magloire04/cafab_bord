@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.alert').forEach((alert) => {
+    document.querySelectorAll('.js-flash').forEach((flash) => {
         setTimeout(() => {
-            alert.classList.add('alert-fade-out');
-            setTimeout(() => alert.remove(), 600);
-        }, 3000);
+            flash.classList.add('is-hiding');
+            setTimeout(() => flash.remove(), 400);
+        }, 4000);
     });
 });
