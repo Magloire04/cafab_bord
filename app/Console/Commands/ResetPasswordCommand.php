@@ -5,8 +5,8 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Services\ChangementMotDePasse;
 use App\Services\GenerateurMotDePasse;
+use App\Support\Email;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class ResetPasswordCommand extends Command
 {
@@ -16,7 +16,7 @@ class ResetPasswordCommand extends Command
 
     public function handle(GenerateurMotDePasse $generateur, ChangementMotDePasse $changement): int
     {
-        $email = Str::lower(trim($this->argument('email')));
+        $email = Email::normaliser($this->argument('email'));
         $user = User::where('email', $email)->first();
 
         if (! $user) {

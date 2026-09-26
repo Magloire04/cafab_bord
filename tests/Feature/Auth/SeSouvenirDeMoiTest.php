@@ -34,6 +34,45 @@ it('logs the user back in from the cookie once the session is gone', function ()
     $this->assertAuthenticatedAs($user);
 });
 
+function changerSonMotDePasse($test)
+{
+    return $test->put('/password', [
+        'current_password' => 'password',
+        'password' => 'Nouveau-Pass1',
+        'password_confirmation' => 'Nouveau-Pass1',
+    ]);
+}
+
+it('re-issues its own remember-me cookie after a password change', function () {
+    $user = User::factory()->create();
+    $recaller = Auth::guard()->getRecallerName();
+
+    $this->actingAs($user)->withCookie($recaller, $user->id.'|'.$user->remember_token.'|'.$user->password);
+
+    changerSonMotDePasse($this)->assertSessionHasNoErrors()->assertCookie($recaller);
+});
+
+it('does not create a remember-me cookie after a password change when there was none', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    changerSonMotDePasse($this)->assertSessionHasNoErrors()->assertCookieMissing(Auth::guard()->getRecallerName());
+});
+
+it('does not turn a foreign or malformed remember-me cookie into one for the user', function (string $valeur) {
+    $user = User::factory()->create();
+    $autre = User::factory()->create();
+    $recaller = Auth::guard()->getRecallerName();
+
+    $this->actingAs($user)->withCookie($recaller, str_replace('{autre}', $autre->id.'|'.$autre->remember_token.'|'.$autre->password, $valeur));
+
+    changerSonMotDePasse($this)->assertSessionHasNoErrors()->assertCookieMissing($recaller);
+})->with([
+    'cookie d\'un autre compte' => '{autre}',
+    'cookie illisible' => 'n-importe-quoi',
+]);
+
 it('forgets the cookie on logout', function () {
     // Laravel n'expire le cookie que si la requête de déconnexion le porte : on se connecte donc vraiment.
     $user = User::factory()->create();

@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -101,6 +102,41 @@ class PasswordResetTest extends TestCase
         $this->post('/forgot-password', ['email' => '  Coach@CAFAB.bj ']);
 
         Notification::assertSentTo($user, ResetPassword::class);
+    }
+
+    public function test_an_email_sent_as_an_array_gets_a_validation_error_not_a_server_error(): void
+    {
+        Notification::fake();
+
+        $this->from('/forgot-password')
+            ->post('/forgot-password', ['email' => ['x@cafab.bj']])
+            ->assertRedirect('/forgot-password')
+            ->assertSessionHasErrors('email');
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_the_password_can_be_reset_with_an_email_typed_in_capitals(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'coach@cafab.bj']);
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+            $this->post('/reset-password', [
+                'token' => $notification->token,
+                'email' => '  Coach@CAFAB.bj ',
+                'password' => 'Nouveau-Pass1',
+                'password_confirmation' => 'Nouveau-Pass1',
+            ])
+                ->assertSessionHasNoErrors()
+                ->assertRedirect(route('login'));
+
+            return true;
+        });
+
+        $this->assertTrue(Hash::check('Nouveau-Pass1', $user->fresh()->password));
     }
 
     public function test_resetting_the_password_clears_a_pending_forced_change(): void

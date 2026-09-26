@@ -5,9 +5,9 @@ namespace App\Console\Commands;
 use App\Enums\UserRole;
 use App\Models\User;
 use App\Services\GenerateurMotDePasse;
+use App\Support\Email;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -21,7 +21,7 @@ class CreateUserCommand extends Command
     {
         $data = [
             'name' => $this->argument('name'),
-            'email' => Str::lower(trim($this->argument('email'))),
+            'email' => Email::normaliser($this->argument('email')),
             'role' => $this->option('role'),
         ];
 

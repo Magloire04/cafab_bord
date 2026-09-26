@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\DeconnecterCoachDesactive;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Middleware\ExigerChangementMotDePasse;
 use App\Http\Middleware\SecurityHeaders;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             SynchroniserSeances::class,
+            // Avant ExigerChangementMotDePasse : un coach désactivé est déconnecté,
+            // pas envoyé vers l'écran de changement de mot de passe.
+            DeconnecterCoachDesactive::class,
             ExigerChangementMotDePasse::class,
         ]);
 

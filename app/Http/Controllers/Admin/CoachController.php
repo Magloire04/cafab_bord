@@ -13,22 +13,33 @@ use App\Services\ChangementMotDePasse;
 use App\Services\GenerateurMotDePasse;
 use App\Services\PinGenerator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class CoachController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): Response
     {
         $coaches = Coach::with('user')->orderBy('created_at', 'desc')->paginate(20);
+        $response = response()->view('admin.coaches.index', compact('coaches'));
 
-        return view('admin.coaches.index', compact('coaches'));
+        // Le mot de passe provisoire n'est affiché qu'une fois : le bouton
+        // Précédent ne doit pas le ressortir du cache du navigateur.
+        if ($request->session()->has('identifiants')) {
+            $response->header('Cache-Control', 'no-store');
+        }
+
+        return $response;
     }
 
-    public function create(GenerateurMotDePasse $generateur): View
+    public function create(GenerateurMotDePasse $generateur): Response
     {
-        return view('admin.coaches.create', ['motDePasse' => $generateur->generer()]);
+        return response()
+            ->view('admin.coaches.create', ['motDePasse' => $generateur->generer()])
+            ->header('Cache-Control', 'no-store');
     }
 
     public function store(StoreCoachRequest $request, PinGenerator $pinGenerator): RedirectResponse

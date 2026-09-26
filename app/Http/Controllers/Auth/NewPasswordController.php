@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ChangementMotDePasse;
+use App\Support\Email;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request, ChangementMotDePasse $changement): RedirectResponse
     {
+        $request->merge(['email' => Email::normaliser($request->input('email'))]);
         $request->validate([
             'token' => ['required'],
             'email' => ['required', 'email'],

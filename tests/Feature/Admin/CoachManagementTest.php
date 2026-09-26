@@ -72,6 +72,38 @@ it('shows the credentials to hand over once, on the list', function () {
         ->assertSee('Provisoire-7!');
 });
 
+it('keeps the pre-filled creation form out of the browser cache and password manager', function () {
+    $response = $this->actingAs($this->admin)->get(route('admin.coaches.create'))->assertOk();
+
+    expect($response->headers->get('Cache-Control'))->toContain('no-store');
+    $response->assertSee('id="email" name="email" type="email" autocomplete="off"', false);
+});
+
+it('keeps the list out of the browser cache while it shows credentials', function () {
+    $response = $this->actingAs($this->admin)
+        ->withSession(['identifiants' => ['nom' => 'Prudence', 'email' => 'prudence@cafab.bj', 'mot_de_passe' => 'Provisoire-7!']])
+        ->get(route('admin.coaches.index'));
+
+    expect($response->headers->get('Cache-Control'))->toContain('no-store');
+});
+
+it('shows the credentials of a new coach on the first list only, uncached', function () {
+    $this->actingAs($this->admin)->post(route('admin.coaches.store'), [
+        'name' => 'Prudence Aïvodji',
+        'email' => 'prudence@cafab.bj',
+        'password' => 'Provisoire-7!',
+        'date_entree' => '2026-01-15',
+    ])->assertRedirect(route('admin.coaches.index'));
+
+    $premiere = $this->get(route('admin.coaches.index'))->assertSee('Provisoire-7!');
+    expect($premiere->headers->get('Cache-Control'))->toContain('no-store');
+
+    $seconde = $this->get(route('admin.coaches.index'))
+        ->assertDontSee('Identifiants à transmettre')
+        ->assertDontSee('Provisoire-7!');
+    expect($seconde->headers->get('Cache-Control'))->not->toContain('no-store');
+});
+
 it('lets the admin edit every field of a coach', function () {
     $coach = Coach::factory()->create(['contact' => '+229 00 00 00 00 00']);
 

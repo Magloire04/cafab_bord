@@ -71,6 +71,16 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function test_an_email_sent_as_an_array_gets_a_validation_error_not_a_server_error(): void
+    {
+        $this->from('/login')
+            ->post('/login', ['email' => ['x@cafab.bj'], 'password' => 'password'])
+            ->assertRedirect('/login')
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+    }
+
     public function test_the_login_screen_has_a_working_password_toggle(): void
     {
         $this->get('/login')->assertSee('data-toggle-password="password"', false);

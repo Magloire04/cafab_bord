@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\Email;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
@@ -24,7 +24,7 @@ class PasswordResetLinkController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->merge(['email' => Str::lower(trim((string) $request->input('email')))]);
+        $request->merge(['email' => Email::normaliser($request->input('email'))]);
         $request->validate(['email' => ['required', 'email']]);
 
         // Même réponse que l'adresse existe ou non, et même quand l'envoi est

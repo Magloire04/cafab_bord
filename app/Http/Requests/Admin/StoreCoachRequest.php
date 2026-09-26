@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Admin;
 
 use App\Services\GenerateurMotDePasse;
+use App\Support\Email;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 
 class StoreCoachRequest extends FormRequest
 {
@@ -15,7 +15,7 @@ class StoreCoachRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge(['email' => Str::lower(trim((string) $this->input('email')))]);
+        $this->merge(['email' => Email::normaliser($this->input('email'))]);
     }
 
     public function rules(): array

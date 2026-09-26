@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Auth\Recaller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,8 +11,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * Seul point d'écriture d'un mot de passe : profil, lien de réinitialisation,
- * changement obligatoire, réinitialisation par l'admin et commande artisan.
+ * Seul point de modification d'un mot de passe existant : profil, lien de
+ * réinitialisation, changement obligatoire, réinitialisation par l'admin et
+ * commande artisan. La création d'un compte (fiche coach, users:create) pose
+ * le premier mot de passe directement.
  */
 class ChangementMotDePasse
 {
@@ -35,7 +38,7 @@ class ChangementMotDePasse
     public function definirPourSessionCourante(Request $request, string $motDePasse): void
     {
         $user = $request->user();
-        $avaitCookieDeRappel = $request->cookies->has(Auth::guard()->getRecallerName());
+        $avaitCookieDeRappel = $this->aSonCookieDeRappel($request, $user);
 
         $this->definir($user, $motDePasse, $request->session()->getId());
 
@@ -58,6 +61,24 @@ class ChangementMotDePasse
         ])->save();
 
         $this->fermerSessions($user, null);
+    }
+
+    /**
+     * Seul un cookie de rappel lisible et au nom de cet utilisateur est réémis :
+     * un cookie périmé d'un autre compte ou illisible ne devient pas un cookie
+     * valable pour lui.
+     */
+    private function aSonCookieDeRappel(Request $request, User $user): bool
+    {
+        $valeur = $request->cookies->get(Auth::guard()->getRecallerName());
+
+        if (! is_string($valeur)) {
+            return false;
+        }
+
+        $rappel = new Recaller($valeur);
+
+        return $rappel->valid() && (string) $rappel->id() === (string) $user->getAuthIdentifier();
     }
 
     private function fermerSessions(User $user, ?string $sessionAConserver): void

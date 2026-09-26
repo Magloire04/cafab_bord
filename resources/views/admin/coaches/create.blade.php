@@ -20,7 +20,8 @@
 
                     <div class="mb-3">
                         <label for="email" class="field-label">E-mail</label>
-                        <input id="email" name="email" type="email" class="field-control" value="{{ old('email') }}" required>
+                        {{-- autocomplete="off" : le navigateur ne propose pas d'enregistrer les identifiants du coach dans le gestionnaire de mots de passe de l'admin. --}}
+                        <input id="email" name="email" type="email" autocomplete="off" class="field-control" value="{{ old('email') }}" required>
                         @error('email') <p class="field-error">{{ $message }}</p> @enderror
                     </div>
 
