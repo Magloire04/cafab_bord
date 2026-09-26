@@ -28,32 +28,42 @@ it('marks a pointage à l’heure when arriving before or at the scheduled time'
     expect($pointage->minutes_retard)->toBe(0);
 });
 
-it('marks en retard between 1 and 15 minutes late', function () {
+it('keeps a pointage à l’heure within the 10-minute tolerance', function () {
     $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:10:00'), SourcePointage::Auto);
 
+    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::ALHeure);
+    expect($pointage->minutes_retard)->toBe(0);
+});
+
+it('ignores the seconds of the tenth minute', function () {
+    $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:10:59'), SourcePointage::Auto);
+
+    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::ALHeure);
+    expect($pointage->minutes_retard)->toBe(0);
+});
+
+it('marks en retard beyond the tolerance, counting minutes from the scheduled start', function () {
+    $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:11:00'), SourcePointage::Auto);
+
     expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::EnRetard);
-    expect($pointage->minutes_retard)->toBe(10);
+    expect($pointage->minutes_retard)->toBe(11);
 });
 
-it('marks retard fort beyond 15 minutes late', function () {
-    $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:20:00'), SourcePointage::Auto);
+it('marks 12:07 à l’heure for a séance scheduled at 12:06', function () {
+    $seance = Seance::factory()->create(['date' => '2026-09-26', 'heure_prevue' => '12:06:00', 'statut' => StatutSeance::EnCours]);
 
-    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::RetardFort);
-    expect($pointage->minutes_retard)->toBe(20);
+    $pointage = $this->service->pointer($seance, $this->fille, Carbon::parse('2026-09-26 12:07:00'), SourcePointage::Coach);
+
+    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::ALHeure);
 });
 
-it('treats exactly 15 minutes late as en retard, not retard fort', function () {
-    $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:15:00'), SourcePointage::Auto);
+it('reports 13 minutes late for 12:19 on a séance scheduled at 12:06', function () {
+    $seance = Seance::factory()->create(['date' => '2026-09-26', 'heure_prevue' => '12:06:00', 'statut' => StatutSeance::EnCours]);
+
+    $pointage = $this->service->pointer($seance, $this->fille, Carbon::parse('2026-09-26 12:19:00'), SourcePointage::Coach);
 
     expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::EnRetard);
-    expect($pointage->minutes_retard)->toBe(15);
-});
-
-it('treats exactly 16 minutes late as retard fort', function () {
-    $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:16:00'), SourcePointage::Auto);
-
-    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::RetardFort);
-    expect($pointage->minutes_retard)->toBe(16);
+    expect($pointage->minutes_retard)->toBe(13);
 });
 
 it('treats an exact on-time arrival as à l’heure with zero minutes late', function () {
@@ -79,7 +89,7 @@ it('lets a coach record a pointage at a specific backdated time, not just now', 
     $pointage = $this->service->pointer($this->seance, $this->fille, Carbon::parse('2026-09-22 17:02:00'), SourcePointage::Coach);
 
     expect($pointage->source)->toBe(SourcePointage::Coach);
-    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::EnRetard);
+    expect($pointage->statut_ponctualite)->toBe(StatutPonctualite::ALHeure);
 });
 
 it('converts a duplicate-insert race caught by the DB unique constraint into PointageException, not a raw QueryException', function () {

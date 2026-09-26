@@ -3,20 +3,22 @@
 use App\Http\Controllers\Admin\CachetController as AdminCachetController;
 use App\Http\Controllers\Admin\CalendrierController;
 use App\Http\Controllers\Admin\CoachController;
-use App\Http\Controllers\Admin\FilleController;
-use App\Http\Controllers\Admin\FilleImportController;
 use App\Http\Controllers\Admin\PaiementController;
-use App\Http\Controllers\Admin\PlanningController;
 use App\Http\Controllers\Admin\PointageController as AdminPointageController;
 use App\Http\Controllers\Admin\PrestationController;
 use App\Http\Controllers\Admin\RapportDepensesController;
 use App\Http\Controllers\Admin\RapportPonctualiteController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EtatSeancesController;
 use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
+use App\Http\Controllers\Kiosque\EtatController as KiosqueEtatController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
+use App\Http\Controllers\PlanningController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Registre\FilleController;
+use App\Http\Controllers\Registre\FilleImportController;
 use App\Http\Controllers\SeanceController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,21 @@ Route::middleware(['auth', 'role:admin'])->get('/admin/ping', fn () => 'pong');
 Route::middleware(['auth', 'role:admin,coach'])->group(function () {
     Route::get('seances/extraordinaire/creer', [SeanceController::class, 'create'])->name('seances.create-extraordinaire');
     Route::post('seances/extraordinaire', [SeanceController::class, 'store'])->name('seances.store-extraordinaire');
+
+    Route::get('etat-seances', EtatSeancesController::class)->name('etat-seances');
+
+    Route::prefix('registre')->group(function () {
+        Route::get('filles/import', [FilleImportController::class, 'form'])->name('filles.import');
+        Route::post('filles/import/preview', [FilleImportController::class, 'preview'])->name('filles.import.preview');
+        Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])->name('filles.import.confirm');
+
+        Route::resource('filles', FilleController::class)->except(['show', 'destroy']);
+        Route::patch('filles/{fille}/toggle-statut', [FilleController::class, 'toggleStatut'])->name('filles.toggle-statut');
+        Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regeneratePin'])->name('filles.regenerate-pin');
+    });
+
+    Route::resource('planning', PlanningController::class)->except(['show', 'destroy'])->names('plannings');
+    Route::patch('planning/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])->name('plannings.toggle-actif');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -44,22 +61,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('coaches.toggle-statut');
     Route::patch('coaches/{coach}/regenerate-pin', [CoachController::class, 'regeneratePin'])
         ->name('coaches.regenerate-pin');
-
-    Route::resource('filles', FilleController::class)->except(['show', 'destroy']);
-    Route::patch('filles/{fille}/toggle-statut', [FilleController::class, 'toggleStatut'])
-        ->name('filles.toggle-statut');
-    Route::patch('filles/{fille}/regenerate-pin', [FilleController::class, 'regeneratePin'])
-        ->name('filles.regenerate-pin');
-
-    Route::get('filles/import', [FilleImportController::class, 'form'])->name('filles.import');
-    Route::post('filles/import/preview', [FilleImportController::class, 'preview'])->name('filles.import.preview');
-    Route::post('filles/import/confirm', [FilleImportController::class, 'confirm'])->name('filles.import.confirm');
-
-    Route::resource('plannings', PlanningController::class)
-        ->except(['show', 'destroy'])
-        ->parameters(['plannings' => 'planning']);
-    Route::patch('plannings/{planning}/toggle-actif', [PlanningController::class, 'toggleActif'])
-        ->name('plannings.toggle-actif');
+    Route::patch('coaches/{coach}/reset-password', [CoachController::class, 'resetPassword'])
+        ->name('coaches.reset-password');
 
     Route::get('calendrier', [CalendrierController::class, 'index'])->name('calendrier');
 
@@ -106,6 +109,8 @@ Route::prefix('kiosque')->name('kiosque.')->group(function () {
 
     Route::get('cachets', [KiosqueCachetController::class, 'index'])->name('cachets.index');
     Route::post('cachets/{cachet}/declarer', [KiosqueCachetController::class, 'declarer'])->name('cachets.declarer');
+
+    Route::get('etat', KiosqueEtatController::class)->name('etat');
 });
 
 require __DIR__.'/auth.php';

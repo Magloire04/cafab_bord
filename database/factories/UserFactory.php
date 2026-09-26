@@ -44,4 +44,12 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Compte avec un mot de passe provisoire à changer à la prochaine connexion.
+     */
+    public function motDePasseProvisoire(): static
+    {
+        return $this->state(fn (array $attributes) => ['must_change_password' => true]);
+    }
 }

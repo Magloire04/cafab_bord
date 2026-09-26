@@ -34,3 +34,28 @@ it('is idempotent — running it twice does not duplicate séances', function ()
 
     Carbon::setTestNow();
 });
+
+it('does not create today\'s séance once its hour has passed', function () {
+    Carbon::setTestNow('2026-09-22 18:00:00'); // mardi
+
+    $planning = PlanningRepetition::factory()->create(['jour_semaine' => 2, 'heure_debut' => '17:00:00', 'actif' => true]);
+
+    (new SeanceGenerator)->genererPourLesProchainsJours(14);
+
+    expect(Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-22')->exists())->toBeFalse();
+    expect(Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-29')->exists())->toBeTrue();
+
+    Carbon::setTestNow();
+});
+
+it('creates today\'s séance when its hour is still to come', function () {
+    Carbon::setTestNow('2026-09-22 16:00:00'); // mardi
+
+    $planning = PlanningRepetition::factory()->create(['jour_semaine' => 2, 'heure_debut' => '17:00:00', 'actif' => true]);
+
+    (new SeanceGenerator)->genererPourLesProchainsJours(14);
+
+    expect(Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-22')->where('statut', 'a_venir')->exists())->toBeTrue();
+
+    Carbon::setTestNow();
+});

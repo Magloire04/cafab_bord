@@ -22,6 +22,12 @@ class SeanceGenerator
                     continue;
                 }
 
+                // Un créneau créé aujourd'hui après son heure ne doit pas produire de
+                // séance du jour : elle serait clôturée demain avec toutes les filles absentes.
+                if ($date->isToday() && Carbon::parse($date->toDateString().' '.$planning->heure_debut)->isPast()) {
+                    continue;
+                }
+
                 $existe = Seance::where('planning_repetition_id', $planning->id)
                     ->whereDate('date', $date->toDateString())
                     ->exists();

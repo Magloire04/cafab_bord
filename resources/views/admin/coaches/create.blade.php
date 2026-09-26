@@ -2,6 +2,7 @@
     <x-slot name="header">
         <div>
             <h1 class="page-title">Ajouter un coach</h1>
+            <p class="field-hint mb-0">Un mot de passe provisoire est proposé : le coach devra le changer à sa première connexion.</p>
         </div>
     </x-slot>
 
@@ -19,8 +20,20 @@
 
                     <div class="mb-3">
                         <label for="email" class="field-label">E-mail</label>
-                        <input id="email" name="email" type="email" class="field-control" value="{{ old('email') }}" required>
+                        {{-- autocomplete="off" : le navigateur ne propose pas d'enregistrer les identifiants du coach dans le gestionnaire de mots de passe de l'admin. --}}
+                        <input id="email" name="email" type="email" autocomplete="off" class="field-control" value="{{ old('email') }}" required>
                         @error('email') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="field-label">Mot de passe provisoire</label>
+                        <x-champ-mot-de-passe id="password" name="password" autocomplete="new-password" value="{{ $motDePasse }}" class="mono" />
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="button" class="btn-outline btn-sm" data-generer-mot-de-passe="password">Générer</button>
+                            <button type="button" class="btn-outline btn-sm" data-copier-champ="password">Copier</button>
+                        </div>
+                        <p class="field-hint">10 caractères au moins, avec majuscule, minuscule, chiffre et caractère spécial.</p>
+                        @error('password') <p class="field-error">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="mb-3">

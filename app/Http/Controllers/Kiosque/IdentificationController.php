@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cachet;
 use App\Models\Fille;
 use App\Models\Seance;
+use App\Services\EtatSeances;
 use App\Services\KioskIdentifier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,11 +14,17 @@ use Illuminate\View\View;
 
 class IdentificationController extends Controller
 {
-    public function home(): View
+    public function home(EtatSeances $etat): View
     {
-        $seance = Seance::where('statut', 'en_cours')->whereDate('date', today())->latest('heure_prevue')->first();
+        // Un seul calcul pour la page et pour ses attributs data-* : le script de
+        // rafraîchissement compare ces identifiants à ceux de kiosque.etat, qui
+        // renvoie les mêmes. S'ils différaient, le kiosque se rechargerait en boucle.
+        $etatKiosque = $etat->pourKiosque();
 
-        return view('kiosque.accueil', compact('seance'));
+        return view('kiosque.accueil', [
+            'seance' => $etatKiosque['en_cours_id'] ? Seance::with('coach.user')->find($etatKiosque['en_cours_id']) : null,
+            'prochaine' => $etatKiosque['prochaine'],
+        ]);
     }
 
     public function identifier(Request $request, KioskIdentifier $identifier): RedirectResponse

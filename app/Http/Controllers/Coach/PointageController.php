@@ -28,6 +28,7 @@ class PointageController extends Controller
             ->first()
             ?? Seance::where('coach_id', $coach?->id)
                 ->where('statut', 'a_venir')
+                ->whereDate('date', '>=', today())
                 ->orderBy('date')
                 ->orderBy('heure_prevue')
                 ->first();

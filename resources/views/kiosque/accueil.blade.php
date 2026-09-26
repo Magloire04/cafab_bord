@@ -9,17 +9,18 @@
     @vite(['resources/css/app.scss', 'resources/js/app.js'])
 </head>
 <body>
-    <div class="kiosk d-flex flex-column">
+    <div class="kiosk d-flex flex-column"
+         data-kiosque-etat
+         data-url="{{ route('kiosque.etat') }}"
+         data-en-cours-id="{{ $seance?->id }}"
+         data-prochaine-id="{{ $prochaine['id'] ?? '' }}">
         <div class="kiosk-topbar">
             <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB" class="kiosk-logo">
             <div class="d-flex align-items-center gap-3">
                 @if ($seance)
                     <span class="badge-st st-fort">Séance en cours</span>
                 @endif
-                <span class="page-title kiosk-clock"
-                      x-data="{ heure: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) }"
-                      x-init="setInterval(() => heure = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}), 10000)"
-                      x-text="heure"></span>
+                <x-horloge variante="kiosque" />
             </div>
         </div>
 
@@ -27,9 +28,12 @@
             <h1 class="kiosk-title mb-2">Tape ton code</h1>
             <p class="field-hint kiosk-subtitle mb-4">
                 @if ($seance)
-                    Répétition en cours — début prévu {{ \Illuminate\Support\Carbon::parse($seance->heure_prevue)->format('H:i') }}
+                    Répétition en cours, début prévu {{ \Illuminate\Support\Carbon::parse($seance->heure_prevue)->format('H:i') }}
                 @else
                     Aucune répétition en cours pour le moment.
+                    @if ($prochaine)
+                        <br>{{ $prochaine['texte'] }}.
+                    @endif
                 @endif
             </p>
 
@@ -41,7 +45,7 @@
                 @csrf
                 <input type="hidden" name="pin" x-model="pin">
 
-                <div class="d-flex gap-2 mb-4">
+                <div class="d-flex gap-2 mb-4 justify-content-center">
                     <template x-for="i in 4" :key="i">
                         <div class="pin-key pin-dot d-flex align-items-center justify-content-center" x-text="pin.length >= i ? '•' : ''"></div>
                     </template>

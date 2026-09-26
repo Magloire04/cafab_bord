@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Support\Email;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -34,6 +35,14 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['email' => Email::normaliser($this->input('email'))]);
+    }
+
+    /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws ValidationException
@@ -51,6 +60,17 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // Identifiants corrects mais coach désactivé par l'admin : la session
+        // qui vient de s'ouvrir est refermée (logout retire aussi le cookie
+        // « se souvenir de moi » qu'attempt() venait de préparer).
+        if (Auth::user()->estCoachDesactive()) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => trans('auth.inactive'),
+            ]);
+        }
     }
 
     /**

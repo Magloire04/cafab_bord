@@ -16,36 +16,39 @@
             <div class="logo-box">
                 <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
             </div>
+            <x-horloge variante="sidebar" />
 
             <nav class="d-flex flex-column gap-1">
+                @php($estAdmin = auth()->user()->role === \App\Enums\UserRole::Admin)
+
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     Tableau de bord
                 </a>
 
-                @if (auth()->user()->role === \App\Enums\UserRole::Admin)
-                    <a href="{{ route('admin.coaches.index') }}" class="nav-link {{ request()->routeIs(['admin.coaches.*', 'admin.filles.*']) ? 'active' : '' }}">
-                        Registre
-                    </a>
-                    <a href="{{ route('admin.plannings.index') }}" class="nav-link {{ request()->routeIs(['admin.plannings.*', 'admin.calendrier', 'admin.pointages.*', 'seances.create-extraordinaire']) ? 'active' : '' }}">
-                        Planning
-                    </a>
-                    <a href="{{ route('admin.prestations.index') }}" class="nav-link {{ request()->routeIs(['admin.prestations.*', 'admin.paiements.*']) ? 'active' : '' }}">
-                        Prestations &amp; cachets
-                    </a>
-                    <a href="{{ route('admin.rapports.index') }}" class="nav-link {{ request()->routeIs('admin.rapports.*') ? 'active' : '' }}">
-                        Rapports
-                    </a>
-                @endif
-
-                @if (auth()->user()->role === \App\Enums\UserRole::Coach)
+                @unless ($estAdmin)
                     <a href="{{ route('coach.seance') }}" class="nav-link {{ request()->routeIs('coach.seance') ? 'active' : '' }}">
                         Ma répétition
                     </a>
                     <a href="{{ route('coach.historique') }}" class="nav-link {{ request()->routeIs('coach.historique') ? 'active' : '' }}">
                         Mon historique
                     </a>
-                    <a href="{{ route('seances.create-extraordinaire') }}" class="nav-link {{ request()->routeIs('seances.create-extraordinaire') ? 'active' : '' }}">
-                        Séance extraordinaire
+                @endunless
+
+                <a href="{{ $estAdmin ? route('admin.coaches.index') : route('filles.index') }}"
+                   class="nav-link {{ request()->routeIs(['admin.coaches.*', 'filles.*']) ? 'active' : '' }}">
+                    Registre
+                </a>
+                <a href="{{ route('plannings.index') }}"
+                   class="nav-link {{ request()->routeIs(['plannings.*', 'admin.calendrier', 'admin.pointages.*', 'seances.create-extraordinaire']) ? 'active' : '' }}">
+                    Planning
+                </a>
+
+                @if ($estAdmin)
+                    <a href="{{ route('admin.prestations.index') }}" class="nav-link {{ request()->routeIs(['admin.prestations.*', 'admin.paiements.*']) ? 'active' : '' }}">
+                        Prestations &amp; cachets
+                    </a>
+                    <a href="{{ route('admin.rapports.index') }}" class="nav-link {{ request()->routeIs('admin.rapports.*') ? 'active' : '' }}">
+                        Rapports
                     </a>
                 @endif
 
@@ -69,9 +72,11 @@
         </aside>
 
         <main class="main">
-            @if (session('message') || session('status'))
+            <x-bandeau-seance />
+
+            @if (session('message'))
                 <div class="js-flash callout-success m-3" role="alert">
-                    <span class="fw-semibold">{{ session('message') ?? session('status') }}</span>
+                    <span class="fw-semibold">{{ session('message') }}</span>
                 </div>
             @endif
 
@@ -91,6 +96,21 @@
                 {{ $slot }}
             </div>
         </main>
+    </div>
+
+    <div class="modal fade" id="modale-confirmation" tabindex="-1" aria-labelledby="modale-confirmation-titre" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modale-cafab">
+                <div class="modal-body">
+                    <h2 class="section-title mb-2" id="modale-confirmation-titre">Confirmation</h2>
+                    <p class="mb-0" data-confirmation-message></p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-outline btn-sm" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn-ink btn-sm" data-confirmation-valider>Confirmer</button>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

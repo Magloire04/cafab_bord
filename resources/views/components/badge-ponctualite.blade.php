@@ -4,7 +4,6 @@
     $config = match ($statut?->value ?? $statut) {
         'a_l_heure' => ['class' => 'st-heure', 'label' => 'À l\'heure'],
         'en_retard' => ['class' => 'st-retard', 'label' => 'En retard'],
-        'retard_fort' => ['class' => 'st-fort', 'label' => 'Retard fort'],
         'absent' => ['class' => 'st-absent', 'label' => 'Absent'],
         default => ['class' => 'st-absent', 'label' => 'Pas encore pointée'],
     };

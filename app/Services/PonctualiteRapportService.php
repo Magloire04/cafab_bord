@@ -36,7 +36,7 @@ class PonctualiteRapportService
                     : $premier->pointable->user->name;
 
                 $presences = $groupe->where('statut_ponctualite', StatutPonctualite::ALHeure)->count();
-                $enRetard = $groupe->whereIn('statut_ponctualite', [StatutPonctualite::EnRetard, StatutPonctualite::RetardFort]);
+                $enRetard = $groupe->where('statut_ponctualite', StatutPonctualite::EnRetard);
                 $absences = $groupe->where('statut_ponctualite', StatutPonctualite::Absent)->count();
                 $total = $groupe->count();
 

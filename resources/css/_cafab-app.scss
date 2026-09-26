@@ -382,12 +382,59 @@ textarea.field-control {
   width: auto;
 }
 
-.kiosk-clock {
-  font-size: 28px;
-}
-
+/* Kiosque : bloc « Tape ton code » centré dans la page (#16) */
 .kiosk-pin-panel {
   max-width: 480px;
+  width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Bandeau de séance (haut des écrans admin et coach) */
+.bandeau-seance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--info-bg);
+  color: var(--info-ink);
+  padding: 12px 34px;
+  border-bottom: 1px solid var(--border);
+}
+
+// Les classes ci-dessus fixent display : sans cette règle, l'attribut hidden resterait sans effet.
+.bandeau-seance[hidden],
+.bandeau-seance [hidden] {
+  display: none !important;
+}
+
+.bandeau-seance-lignes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bandeau-ligne {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bandeau-ligne::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.bandeau-en-cours {
+  color: var(--st-fort-fg);
 }
 
 .kiosk-subtitle {
@@ -586,3 +633,86 @@ textarea.field-control {
 .kiosk-title-sm { font-size: 36px; }
 .kiosk-cachet-title { font-weight: 700; font-size: 20px; margin-bottom: 4px; }
 .kiosk-cachet-amount { font-size: 22px; }
+
+/* Horloge en temps réel (#13) */
+.horloge {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.horloge-sidebar {
+  color: var(--sidebar-text);
+  text-align: center;
+  margin: -16px 0 24px;
+}
+
+.horloge-auth {
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+
+.horloge-kiosque {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+/* Onglets internes des sections Registre, Planning, Prestations & cachets */
+.onglets {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.onglet {
+  padding: 10px 16px;
+  margin-bottom: -1px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.onglet:hover {
+  color: var(--ink);
+}
+
+.onglet.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* Menu « … » des tableaux */
+.menu-actions-declencheur {
+  min-width: 40px;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.menu-actions {
+  border-radius: var(--r-btn);
+  padding: 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.menu-actions .dropdown-item {
+  border-radius: var(--r-btn-sm);
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Fenêtres modales (confirmation, formulaires de cachet) */
+.modale-cafab {
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  font-family: var(--font-body);
+  color: var(--ink);
+}

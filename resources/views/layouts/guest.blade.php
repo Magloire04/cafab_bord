@@ -13,6 +13,12 @@
 <body>
     <div class="auth-shell">
         <div class="auth-card">
+            <div class="logo-box">
+                <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
+            </div>
+            <x-horloge variante="auth" />
+            <p class="overline mb-1">Présence &amp; paiements</p>
+
             {{ $slot }}
         </div>
     </div>

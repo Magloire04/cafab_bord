@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\StatutSeance;
-use App\Models\Seance;
+use App\Services\SeanceCycleDeVie;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
 
 class DemarrerSeancesCommand extends Command
 {
@@ -13,15 +11,9 @@ class DemarrerSeancesCommand extends Command
 
     protected $description = 'Passe en "en_cours" les séances à venir dont l\'heure prévue est arrivée';
 
-    public function handle(): int
+    public function handle(SeanceCycleDeVie $cycleDeVie): int
     {
-        $demarrees = Seance::where('statut', StatutSeance::AVenir)
-            ->get()
-            ->filter(fn (Seance $seance) => $seance->date->isToday() && $seance->heurePrevueCarbon()->lessThanOrEqualTo(Carbon::now()))
-            ->each(fn (Seance $seance) => $seance->update(['statut' => StatutSeance::EnCours]))
-            ->count();
-
-        $this->info("{$demarrees} séance(s) démarrée(s).");
+        $this->info("{$cycleDeVie->demarrer()} séance(s) démarrée(s).");
 
         return self::SUCCESS;
     }

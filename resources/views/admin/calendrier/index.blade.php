@@ -22,6 +22,8 @@
         </div>
     </x-slot>
 
+    <x-onglets.planning />
+
     <div class="content-card mb-3">
         <div class="calendar-legend">
             <span><span class="dot is-ok"></span>Présence ≥ 85 %</span>

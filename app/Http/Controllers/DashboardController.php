@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\StatutCachet;
 use App\Enums\StatutPersonne;
-use App\Enums\StatutSeance;
 use App\Enums\UserRole;
 use App\Models\Cachet;
 use App\Models\Coach;
@@ -25,9 +24,7 @@ class DashboardController extends Controller
                     'coachsActifs' => Coach::where('statut', StatutPersonne::Actif)->count(),
                     'fillesActives' => Fille::where('statut', StatutPersonne::Actif)->count(),
                     'seancesAujourdhui' => Seance::whereDate('date', today())->count(),
-                    'seancesEnCours' => Seance::where('statut', StatutSeance::EnCours)->count(),
                     'cachetsDusMontant' => (float) Cachet::where('statut', StatutCachet::Du)->sum('montant'),
-                    'cachetsAValider' => Cachet::where('statut', StatutCachet::DeclareePayee)->count(),
                 ],
             ]);
         }
