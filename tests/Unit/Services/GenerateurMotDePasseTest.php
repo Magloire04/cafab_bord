@@ -31,3 +31,11 @@ it('does not repeat itself', function () {
 
     expect(collect(range(1, 50))->map(fn () => $generateur->generer())->unique())->toHaveCount(50);
 });
+
+it('refuses a length below the provisional rule minimum', function () {
+    expect(fn () => (new GenerateurMotDePasse)->generer(9))->toThrow(InvalidArgumentException::class);
+});
+
+it('accepts a longer length', function () {
+    expect(strlen((new GenerateurMotDePasse)->generer(16)))->toBe(16);
+});

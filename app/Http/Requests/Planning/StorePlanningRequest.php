@@ -3,14 +3,18 @@
 namespace App\Http\Requests\Planning;
 
 use App\Enums\UserRole;
+use App\Models\PlanningRepetition;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StorePlanningRequest extends FormRequest
 {
+    /**
+     * Vérifiée avant la validation : un compte refusé reçoit 403 même avec un formulaire invalide.
+     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('create', PlanningRepetition::class);
     }
 
     public function rules(): array

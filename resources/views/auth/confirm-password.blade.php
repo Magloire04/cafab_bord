@@ -2,7 +2,7 @@
     <h1 class="page-title">Confirmer le mot de passe</h1>
 
     <p class="field-hint mt-2 mb-0">
-        Cette zone de l'application est protégée. Confirme ton mot de passe pour continuer.
+        Cette zone de l'application est protégée. Confirmez votre mot de passe pour continuer.
     </p>
 
     <form method="POST" action="{{ route('password.confirm') }}">

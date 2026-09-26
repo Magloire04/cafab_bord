@@ -13,17 +13,25 @@
                 <form action="{{ route('seances.store-extraordinaire') }}" method="POST">
                     @csrf
 
-                    <div class="mb-3">
-                        <label for="coach_id" class="field-label">Coach référent</label>
-                        <select id="coach_id" name="coach_id" class="field-select" required>
-                            @foreach ($coaches as $coach)
-                                <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
-                                    {{ $coach->user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('coach_id') <p class="field-error">{{ $message }}</p> @enderror
-                    </div>
+                    @if (auth()->user()->role === \App\Enums\UserRole::Admin)
+                        <div class="mb-3">
+                            <label for="coach_id" class="field-label">Coach référent</label>
+                            <select id="coach_id" name="coach_id" class="field-select" required>
+                                @foreach ($coaches as $coach)
+                                    <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
+                                        {{ $coach->user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('coach_id') <p class="field-error">{{ $message }}</p> @enderror
+                        </div>
+                    @else
+                        <div class="mb-3">
+                            <label for="coach_referent" class="field-label">Coach référent</label>
+                            <input id="coach_referent" type="text" class="field-control" value="{{ auth()->user()->name }}" disabled>
+                            <p class="field-hint">Vos séances sont toujours à votre nom.</p>
+                        </div>
+                    @endif
 
                     <div class="mb-3">
                         <label for="date" class="field-label">Date</label>

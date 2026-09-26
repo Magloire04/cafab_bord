@@ -15,11 +15,15 @@ document.addEventListener('click', async (evenement) => {
 
     try {
         await navigator.clipboard.writeText(texte);
-        const libelle = bouton.textContent;
+
+        // Le libellé d'origine est mémorisé une seule fois : un double clic lirait
+        // sinon « Copié » comme libellé à restaurer et le bouton y resterait bloqué.
+        bouton.dataset.libelleOrigine ??= bouton.textContent;
         bouton.textContent = 'Copié';
-        setTimeout(() => {
-            bouton.textContent = libelle;
-        }, 1500);
+        clearTimeout(Number(bouton.dataset.minuterieCopie));
+        bouton.dataset.minuterieCopie = String(setTimeout(() => {
+            bouton.textContent = bouton.dataset.libelleOrigine;
+        }, 1500));
     } catch {
         // Presse-papiers indisponible (page hors contexte sécurisé) : l'utilisateur copie à la main.
         window.prompt('Copiez le texte ci-dessous :', texte);

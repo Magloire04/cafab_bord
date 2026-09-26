@@ -19,6 +19,15 @@ class PasswordConfirmationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_the_confirm_password_screen_addresses_the_user_as_vous(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/confirm-password')
+            ->assertSee('Confirmez votre mot de passe pour continuer.')
+            ->assertDontSee('Confirme ton mot de passe');
+    }
+
     public function test_password_can_be_confirmed(): void
     {
         $user = User::factory()->create();

@@ -51,6 +51,14 @@ it('shows a coach only his own séances, without his own name', function () {
         ]]]);
 });
 
+it('says aujourd\'hui for a séance later today', function () {
+    Seance::factory()->create(['coach_id' => $this->coach->id, 'date' => '2026-09-26', 'heure_prevue' => '19:00:00', 'statut' => StatutSeance::AVenir]);
+
+    $this->actingAs($this->admin)->getJson(route('etat-seances'))
+        ->assertOk()
+        ->assertJsonPath('lignes.0.texte', "Prochaine répétition : aujourd'hui à 19:00 · Prudence Aïvodji");
+});
+
 it('says demain for tomorrow\'s séance', function () {
     Seance::factory()->create(['coach_id' => $this->coach->id, 'date' => '2026-09-27', 'heure_prevue' => '17:00:00', 'statut' => StatutSeance::AVenir]);
 

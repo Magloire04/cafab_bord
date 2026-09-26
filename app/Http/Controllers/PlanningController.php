@@ -34,10 +34,9 @@ class PlanningController extends Controller
         return view('plannings.create', compact('coaches'));
     }
 
+    // Autorisation : StorePlanningRequest::authorize().
     public function store(StorePlanningRequest $request): RedirectResponse
     {
-        Gate::authorize('create', PlanningRepetition::class);
-
         PlanningRepetition::create([
             'jour_semaine' => $request->validated('jour_semaine'),
             'heure_debut' => $request->validated('heure_debut'),
@@ -58,10 +57,9 @@ class PlanningController extends Controller
         return view('plannings.edit', compact('planning', 'coaches'));
     }
 
+    // Autorisation : UpdatePlanningRequest::authorize().
     public function update(UpdatePlanningRequest $request, PlanningRepetition $planning): RedirectResponse
     {
-        Gate::authorize('update', $planning);
-
         $planning->update([
             'jour_semaine' => $request->validated('jour_semaine'),
             'heure_debut' => $request->validated('heure_debut'),
@@ -96,13 +94,16 @@ class PlanningController extends Controller
 
     /**
      * SeanceGenerator ignore toute date qui a déjà une séance pour ce créneau :
-     * après un changement d'heure ou une désactivation, les séances futures « à
-     * venir » (sans pointage possible) sont supprimées puis régénérées tout de suite.
+     * après un changement d'heure ou une désactivation, les séances « à venir »
+     * d'aujourd'hui et des jours suivants sont supprimées puis régénérées tout
+     * de suite. Elles ne portent aucun pointage (PointageService::pointer exige
+     * une séance en cours). Celle du jour n'est recréée que si sa nouvelle heure
+     * est encore à venir ; une séance déjà démarrée n'est jamais touchée.
      */
     private function reconcilerSeancesFutures(PlanningRepetition $planning): void
     {
         Seance::where('planning_repetition_id', $planning->id)
-            ->where('date', '>', today())
+            ->whereDate('date', '>=', today())
             ->where('statut', 'a_venir')
             ->delete();
 

@@ -8,9 +8,13 @@ use Illuminate\Validation\Rule;
 
 class UpdatePlanningRequest extends FormRequest
 {
+    /**
+     * Vérifiée avant la validation : un coach qui vise le créneau d'un autre
+     * reçoit 403 même avec un formulaire invalide.
+     */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('update', $this->route('planning'));
     }
 
     public function rules(): array

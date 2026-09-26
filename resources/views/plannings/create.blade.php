@@ -43,8 +43,8 @@
                         </div>
                     @else
                         <div class="mb-4">
-                            <span class="field-label">Coach référent</span>
-                            <input type="text" class="field-control" value="{{ auth()->user()->name }}" disabled>
+                            <label for="coach_referent" class="field-label">Coach référent</label>
+                            <input id="coach_referent" type="text" class="field-control" value="{{ auth()->user()->name }}" disabled>
                             <p class="field-hint">Vos créneaux sont toujours à votre nom.</p>
                         </div>
                     @endif

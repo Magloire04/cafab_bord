@@ -118,6 +118,52 @@ it('removes a planning\'s future séances when it is deactivated, and does not r
     Carbon::setTestNow();
 });
 
+it('removes today\'s séance still to come when the créneau is deactivated in the morning', function () {
+    Carbon::setTestNow('2026-09-22 08:00:00'); // mardi
+    $planning = PlanningRepetition::factory()->create(['jour_semaine' => 2, 'heure_debut' => '17:00:00', 'actif' => true]);
+    app(SeanceGenerator::class)->genererPourLesProchainsJours();
+    expect(Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-22')->exists())->toBeTrue();
+
+    $this->actingAs($this->admin)->patch(route('plannings.toggle-actif', $planning));
+
+    expect(Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-22')->exists())->toBeFalse();
+
+    Carbon::setTestNow();
+});
+
+it('moves today\'s séance still to come to the new hour when the créneau is re-timed in the morning', function () {
+    Carbon::setTestNow('2026-09-22 08:00:00'); // mardi
+    $planning = PlanningRepetition::factory()->create(['jour_semaine' => 2, 'heure_debut' => '17:00:00', 'actif' => true]);
+    app(SeanceGenerator::class)->genererPourLesProchainsJours();
+
+    $this->actingAs($this->admin)->put(route('plannings.update', $planning), [
+        'jour_semaine' => 2,
+        'heure_debut' => '18:30',
+        'coach_id' => $planning->coach_id,
+    ]);
+
+    $aujourdhui = Seance::where('planning_repetition_id', $planning->id)->whereDate('date', '2026-09-22')->get();
+    expect($aujourdhui)->toHaveCount(1);
+    expect($aujourdhui->first()->heure_prevue)->toBe('18:30:00');
+
+    Carbon::setTestNow();
+});
+
+it('keeps today\'s séance once it has started', function () {
+    Carbon::setTestNow('2026-09-22 17:05:00'); // mardi
+    $planning = PlanningRepetition::factory()->create(['jour_semaine' => 2, 'heure_debut' => '17:00:00', 'actif' => true]);
+    $enCours = Seance::factory()->create([
+        'planning_repetition_id' => $planning->id, 'coach_id' => $planning->coach_id,
+        'date' => '2026-09-22', 'heure_prevue' => '17:00:00', 'statut' => 'en_cours',
+    ]);
+
+    $this->actingAs($this->admin)->patch(route('plannings.toggle-actif', $planning));
+
+    expect($enCours->fresh())->not->toBeNull();
+
+    Carbon::setTestNow();
+});
+
 it('lets a coach see the whole planning', function () {
     $coach = Coach::factory()->create();
     PlanningRepetition::factory()->count(2)->create();
@@ -137,6 +183,34 @@ it('forces a coach\'s new créneau onto himself, whatever coach_id is sent', fun
 
     expect(PlanningRepetition::where('coach_id', $coach->id)->where('jour_semaine', 1)->exists())->toBeTrue();
     expect(PlanningRepetition::where('coach_id', $autre->id)->exists())->toBeFalse();
+});
+
+it('keeps a coach\'s créneau on himself when he updates it, whatever coach_id is sent', function () {
+    $coach = Coach::factory()->create();
+    $autre = Coach::factory()->create();
+    $planning = PlanningRepetition::factory()->create(['coach_id' => $coach->id, 'heure_debut' => '17:00:00']);
+
+    $this->actingAs($coach->user)->put(route('plannings.update', $planning), [
+        'jour_semaine' => $planning->jour_semaine->value,
+        'heure_debut' => '18:00',
+        'coach_id' => $autre->id,
+    ])->assertRedirect(route('plannings.index'));
+
+    $planning->refresh();
+    expect($planning->coach_id)->toBe($coach->id);
+    expect($planning->heure_debut)->toBe('18:00:00');
+});
+
+it('labels the read-only coach field shown to a coach', function () {
+    $coach = Coach::factory()->create();
+    $planning = PlanningRepetition::factory()->create(['coach_id' => $coach->id]);
+
+    foreach ([route('plannings.create'), route('plannings.edit', $planning)] as $url) {
+        $this->actingAs($coach->user)->get($url)
+            ->assertOk()
+            ->assertSee('<label for="coach_referent" class="field-label">Coach référent</label>', false)
+            ->assertSee('<input id="coach_referent" type="text"', false);
+    }
 });
 
 it('lets a coach edit and deactivate his own créneau', function () {
@@ -161,6 +235,19 @@ it('refuses to let a coach touch another coach\'s créneau', function () {
     $this->actingAs($coach->user)->patch(route('plannings.toggle-actif', $planning))->assertForbidden();
 
     expect($planning->fresh()->heure_debut)->toBe('17:00:00');
+});
+
+it('answers 403, not a validation error, to an empty form on another coach\'s créneau', function () {
+    $coach = Coach::factory()->create();
+    $planning = PlanningRepetition::factory()->create();
+
+    $this->actingAs($coach->user)->put(route('plannings.update', $planning), [])->assertForbidden();
+});
+
+it('answers 403, not a validation error, to an empty créneau from a coach account without a coach profile', function () {
+    $sansProfil = User::factory()->create(['role' => UserRole::Coach]);
+
+    $this->actingAs($sansProfil)->post(route('plannings.store'), [])->assertForbidden();
 });
 
 it('refuses a créneau from a coach account without a coach profile', function () {

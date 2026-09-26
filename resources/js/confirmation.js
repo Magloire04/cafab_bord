@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Annuler, Échap ou clic hors de la fenêtre : la demande en attente est abandonnée.
-    element.addEventListener('hidden.bs.modal', oublier);
+    // Annuler, Échap ou clic hors de la fenêtre : la demande en attente est abandonnée
+    // dès le début de la fermeture, sans attendre la fin de l'animation, pour qu'un
+    // clic sur Confirmer pendant le fondu n'envoie plus rien.
+    element.addEventListener('hide.bs.modal', oublier);
 });
