@@ -102,4 +102,25 @@ class PasswordResetTest extends TestCase
 
         Notification::assertSentTo($user, ResetPassword::class);
     }
+
+    public function test_resetting_the_password_clears_a_pending_forced_change(): void
+    {
+        Notification::fake();
+        $user = User::factory()->motDePasseProvisoire()->create();
+
+        $this->post('/forgot-password', ['email' => $user->email]);
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+            $this->post('/reset-password', [
+                'token' => $notification->token,
+                'email' => $user->email,
+                'password' => 'Nouveau-Pass1',
+                'password_confirmation' => 'Nouveau-Pass1',
+            ])->assertSessionHasNoErrors();
+
+            return true;
+        });
+
+        $this->assertFalse($user->fresh()->must_change_password);
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\ExigerChangementMotDePasse;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SynchroniserSeances;
 use Illuminate\Foundation\Application;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             SynchroniserSeances::class,
+            ExigerChangementMotDePasse::class,
         ]);
 
         $middleware->append(SecurityHeaders::class);

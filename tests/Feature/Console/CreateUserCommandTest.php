@@ -14,6 +14,7 @@ it('creates a coach account with a random password', function () {
 
     expect($user->name)->toBe('Prudence Aïvodji');
     expect($user->role)->toBe(UserRole::Coach);
+    expect($user->must_change_password)->toBeTrue();
 });
 
 it('rejects an invalid role', function () {

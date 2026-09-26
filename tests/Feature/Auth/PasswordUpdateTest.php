@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -47,5 +48,22 @@ class PasswordUpdateTest extends TestCase
         $response
             ->assertSessionHasErrorsIn('updatePassword', 'current_password')
             ->assertRedirect('/profile');
+    }
+
+    public function test_changing_the_password_logs_out_the_other_devices(): void
+    {
+        config(['session.driver' => 'database']);
+        $user = User::factory()->create();
+        DB::table('sessions')->insert([
+            'id' => 'autre-appareil', 'user_id' => $user->id, 'payload' => '', 'last_activity' => now()->timestamp,
+        ]);
+
+        $this->actingAs($user)->from('/profile')->put('/password', [
+            'current_password' => 'password',
+            'password' => 'Nouveau-Pass1',
+            'password_confirmation' => 'Nouveau-Pass1',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseMissing('sessions', ['id' => 'autre-appareil']);
     }
 }
