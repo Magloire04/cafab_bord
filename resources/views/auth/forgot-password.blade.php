@@ -6,7 +6,7 @@
         En cas de problème, contactez l'administrateur.
     </p>
 
-    <x-auth-session-status class="field-hint mt-2" :status="session('status')" />
+    <x-auth-session-status class="mt-3" :status="session('status')" />
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf

@@ -40,7 +40,7 @@
                     <p class="section-title mb-2">Répétition d'aujourd'hui</p>
                     @if ($seanceDuJour)
                         <p class="mb-1">Prévue à <strong class="time">{{ \Illuminate\Support\Carbon::parse($seanceDuJour->heure_prevue)->format('H:i') }}</strong></p>
-                        <p class="field-hint mb-3">Statut : {{ $seanceDuJour->statut->value }}</p>
+                        <p class="field-hint mb-3">Statut : {{ $seanceDuJour->statut->libelle() }}</p>
                         <a href="{{ route('coach.seance') }}" class="btn-ink">Accéder à ma répétition</a>
                     @else
                         <p class="field-hint mb-0">Aucune répétition planifiée aujourd'hui.</p>
@@ -50,7 +50,7 @@
             <div class="col-md-6">
                 <div class="content-card h-100">
                     <p class="section-title mb-2">Historique</p>
-                    <p class="field-hint mb-3">Consulte tes séances passées et ta ponctualité.</p>
+                    <p class="field-hint mb-3">Consultez vos séances passées et votre ponctualité.</p>
                     <a href="{{ route('coach.historique') }}" class="btn-outline">Voir mon historique</a>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <x-guest-layout>
     <h1 class="page-title">Connexion</h1>
 
-    <x-auth-session-status class="field-hint mt-2" :status="session('status')" />
+    <x-auth-session-status class="mt-3" :status="session('status')" />
 
     @if ($errors->any())
         <div class="callout-danger mt-3">

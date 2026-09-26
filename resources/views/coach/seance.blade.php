@@ -4,11 +4,7 @@
         'cloturee' => 'st-absent',
         default => 'st-heure',
     } : null;
-    $statutSeanceLabel = $seance ? match ($seance->statut->value) {
-        'en_cours' => 'En cours',
-        'cloturee' => 'Clôturée',
-        default => 'À venir',
-    } : null;
+    $statutSeanceLabel = $seance?->statut->libelle();
 @endphp
 <x-app-layout>
     <x-slot name="header">

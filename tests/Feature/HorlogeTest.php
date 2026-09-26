@@ -10,18 +10,22 @@ afterEach(fn () => Carbon::setTestNow());
 it('shows the server date and time under the logo on the login screen', function () {
     $this->get(route('login'))
         ->assertOk()
-        ->assertSee('samedi 26 septembre 2026 · 12:27:48')
+        ->assertSeeText('samedi 26 septembre 2026 · 12:27:48')
         ->assertSee('data-horloge', false);
 });
 
-it('shows it under the logo in the sidebar', function () {
+it('shows it under the logo in the sidebar, the time on its own line', function () {
     $admin = User::factory()->create(['role' => UserRole::Admin]);
 
-    $this->actingAs($admin)->get(route('dashboard'))->assertOk()->assertSee('samedi 26 septembre 2026 · 12:27:48');
+    $this->actingAs($admin)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSeeText('samedi 26 septembre 2026 · 12:27:48')
+        ->assertSee('<span class="horloge-date">samedi 26 septembre 2026</span>', false)
+        ->assertSee('<span class="horloge-heure">12:27:48</span>', false);
 });
 
 it('shows it in the kiosk top bar', function () {
-    $this->get(route('kiosque.home'))->assertOk()->assertSee('samedi 26 septembre 2026 · 12:27:48');
+    $this->get(route('kiosque.home'))->assertOk()->assertSeeText('samedi 26 septembre 2026 · 12:27:48');
 });
 
 it('renders the CAFAB logo once on the login card', function () {

@@ -42,4 +42,7 @@ it('aborts without changing anything when two accounts would end up with the sam
     );
 
     expect(DB::table('users')->orderBy('id')->pluck('email')->all())->toBe($avant);
-});
+})->skip(
+    fn () => DB::getDriverName() !== 'sqlite',
+    "Sous MySQL, l'index unique (collation insensible à la casse) refuse déjà ces doublons.",
+);
