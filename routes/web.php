@@ -13,7 +13,9 @@ use App\Http\Controllers\Admin\RapportDepensesController;
 use App\Http\Controllers\Admin\RapportPonctualiteController;
 use App\Http\Controllers\Coach\PointageController as CoachPointageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EtatSeancesController;
 use App\Http\Controllers\Kiosque\CachetController as KiosqueCachetController;
+use App\Http\Controllers\Kiosque\EtatController as KiosqueEtatController;
 use App\Http\Controllers\Kiosque\IdentificationController;
 use App\Http\Controllers\Kiosque\PointageController as KiosquePointageController;
 use App\Http\Controllers\ProfileController;
@@ -36,6 +38,7 @@ Route::middleware(['auth', 'role:admin'])->get('/admin/ping', fn () => 'pong');
 Route::middleware(['auth', 'role:admin,coach'])->group(function () {
     Route::get('seances/extraordinaire/creer', [SeanceController::class, 'create'])->name('seances.create-extraordinaire');
     Route::post('seances/extraordinaire', [SeanceController::class, 'store'])->name('seances.store-extraordinaire');
+    Route::get('etat-seances', EtatSeancesController::class)->name('etat-seances');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -106,6 +109,8 @@ Route::prefix('kiosque')->name('kiosque.')->group(function () {
 
     Route::get('cachets', [KiosqueCachetController::class, 'index'])->name('cachets.index');
     Route::post('cachets/{cachet}/declarer', [KiosqueCachetController::class, 'declarer'])->name('cachets.declarer');
+
+    Route::get('etat', KiosqueEtatController::class)->name('etat');
 });
 
 require __DIR__.'/auth.php';

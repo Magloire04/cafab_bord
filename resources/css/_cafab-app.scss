@@ -386,8 +386,59 @@ textarea.field-control {
   font-size: 28px;
 }
 
+/* Kiosque : bloc « Tape ton code » centré dans la page (#16) */
 .kiosk-pin-panel {
   max-width: 480px;
+  width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Bandeau de séance (haut des écrans admin et coach) */
+.bandeau-seance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--info-bg);
+  color: var(--info-ink);
+  padding: 12px 34px;
+  border-bottom: 1px solid var(--border);
+}
+
+// Les classes ci-dessus fixent display : sans cette règle, l'attribut hidden resterait sans effet.
+.bandeau-seance[hidden],
+.bandeau-seance [hidden] {
+  display: none !important;
+}
+
+.bandeau-seance-lignes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bandeau-ligne {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bandeau-ligne::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.bandeau-en-cours {
+  color: var(--st-fort-fg);
 }
 
 .kiosk-subtitle {

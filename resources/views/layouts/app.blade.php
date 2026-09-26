@@ -69,6 +69,8 @@
         </aside>
 
         <main class="main">
+            <x-bandeau-seance />
+
             @if (session('message') || session('status'))
                 <div class="js-flash callout-success m-3" role="alert">
                     <span class="fw-semibold">{{ session('message') ?? session('status') }}</span>

@@ -3,9 +3,22 @@
 use App\Enums\StatutSeance;
 use App\Models\Fille;
 use App\Models\Seance;
+use Illuminate\Support\Carbon;
 
 it('shows the kiosk home without authentication', function () {
     $this->get(route('kiosque.home'))->assertOk();
+});
+
+it('shows the next répétition when none is in progress', function () {
+    Carbon::setTestNow('2026-09-26 12:00:00');
+    Seance::factory()->create(['date' => '2026-09-28', 'heure_prevue' => '17:00:00', 'statut' => StatutSeance::AVenir]);
+
+    $this->get(route('kiosque.home'))
+        ->assertOk()
+        ->assertSee('Prochaine répétition : lundi 28 septembre à 17:00')
+        ->assertSee('data-kiosque-etat', false);
+
+    Carbon::setTestNow();
 });
 
 it('identifies a fille by pin and stores it in the session', function () {
