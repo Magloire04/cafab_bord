@@ -23,6 +23,11 @@ class ChangementObligatoireController extends Controller
 
     public function update(Request $request, ChangementMotDePasse $changement): RedirectResponse
     {
+        // Sans changement en attente, on passe par le profil, qui exige le mot de passe actuel.
+        if (! $request->user()->must_change_password) {
+            return redirect()->route('dashboard');
+        }
+
         $validated = $request->validate([
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);

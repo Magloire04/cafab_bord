@@ -69,3 +69,13 @@ it('sends a user without a pending change away from the change screen', function
 
     $this->actingAs($normal)->get(route('password.changer'))->assertRedirect(route('dashboard'));
 });
+
+it('does not let a user without a pending change skip the current password through the change screen', function () {
+    $normal = User::factory()->create(['role' => UserRole::Admin]);
+
+    $this->actingAs($normal)
+        ->put(route('password.changer.update'), ['password' => 'Nouveau-Pass1', 'password_confirmation' => 'Nouveau-Pass1'])
+        ->assertRedirect(route('dashboard'));
+
+    expect(Hash::check('password', $normal->fresh()->password))->toBeTrue();
+});
