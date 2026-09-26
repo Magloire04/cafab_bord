@@ -21,14 +21,7 @@
 
         <div class="mb-3">
             <label for="password" class="field-label">Mot de passe</label>
-            <div class="d-flex gap-2">
-                <input type="password" name="password" id="password"
-                    class="field-control" placeholder="••••••••"
-                    required autocomplete="current-password">
-                <button class="btn-outline js-toggle-password" type="button" title="Afficher le mot de passe">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
+            <x-champ-mot-de-passe id="password" name="password" autocomplete="current-password" placeholder="••••••••" />
         </div>
 
         <div class="mb-3 d-flex align-items-center gap-2">

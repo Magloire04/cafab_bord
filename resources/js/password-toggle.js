@@ -1,17 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.js-toggle-password').forEach((button) => {
-        button.addEventListener('click', () => {
-            const input = button.closest('.input-group')?.querySelector('input');
-            const icon = button.querySelector('i');
+    document.querySelectorAll('[data-toggle-password]').forEach((bouton) => {
+        const champ = document.getElementById(bouton.dataset.togglePassword);
+        const icone = bouton.querySelector('i');
 
-            if (!input || !icon) {
-                return;
-            }
+        if (!champ || !icone) {
+            return;
+        }
 
-            const isHidden = input.type === 'password';
-            input.type = isHidden ? 'text' : 'password';
-            icon.classList.toggle('fa-eye', !isHidden);
-            icon.classList.toggle('fa-eye-slash', isHidden);
+        bouton.addEventListener('click', () => {
+            const masque = champ.type === 'password';
+            champ.type = masque ? 'text' : 'password';
+            icone.classList.toggle('fa-eye', !masque);
+            icone.classList.toggle('fa-eye-slash', masque);
+            bouton.setAttribute('aria-label', masque ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
         });
     });
 });

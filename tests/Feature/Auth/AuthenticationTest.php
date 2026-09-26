@@ -61,4 +61,18 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_users_can_authenticate_with_an_email_typed_in_capitals_with_spaces(): void
+    {
+        $user = User::factory()->create(['email' => 'coach@cafab.bj']);
+
+        $this->post('/login', ['email' => '  Coach@CAFAB.bj ', 'password' => 'password']);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_the_login_screen_has_a_working_password_toggle(): void
+    {
+        $this->get('/login')->assertSee('data-toggle-password="password"', false);
+    }
 }

@@ -59,8 +59,8 @@ class PasswordResetTest extends TestCase
             $response = $this->post('/reset-password', [
                 'token' => $notification->token,
                 'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
+                'password' => 'Nouveau-Pass1',
+                'password_confirmation' => 'Nouveau-Pass1',
             ]);
 
             $response
@@ -69,5 +69,37 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_the_same_message_is_shown_for_an_unknown_address(): void
+    {
+        Notification::fake();
+
+        $this->from('/forgot-password')
+            ->post('/forgot-password', ['email' => 'inconnu@cafab.bj'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('status', __('passwords.sent'));
+
+        Notification::assertNothingSent();
+    }
+
+    public function test_the_known_address_gets_the_same_message(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+
+        $this->from('/forgot-password')
+            ->post('/forgot-password', ['email' => $user->email])
+            ->assertSessionHas('status', __('passwords.sent'));
+    }
+
+    public function test_a_reset_link_is_sent_for_an_address_typed_in_capitals(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'coach@cafab.bj']);
+
+        $this->post('/forgot-password', ['email' => '  Coach@CAFAB.bj ']);
+
+        Notification::assertSentTo($user, ResetPassword::class);
     }
 }

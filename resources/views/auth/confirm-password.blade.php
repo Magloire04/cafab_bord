@@ -10,8 +10,7 @@
 
         <div class="mb-3">
             <label for="password" class="field-label">Mot de passe</label>
-            <input id="password" name="password" type="password"
-                class="field-control" required autocomplete="current-password">
+            <x-champ-mot-de-passe id="password" name="password" autocomplete="current-password" />
             @error('password') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 

@@ -15,15 +15,13 @@
 
         <div class="mb-3">
             <label for="password" class="field-label">Mot de passe</label>
-            <input id="password" name="password" type="password"
-                class="field-control" required autocomplete="new-password">
+            <x-champ-mot-de-passe id="password" name="password" autocomplete="new-password" />
             @error('password') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="mb-3">
             <label for="password_confirmation" class="field-label">Confirmer le mot de passe</label>
-            <input id="password_confirmation" name="password_confirmation" type="password"
-                class="field-control" required autocomplete="new-password">
+            <x-champ-mot-de-passe id="password_confirmation" name="password_confirmation" autocomplete="new-password" />
             @error('password_confirmation') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
