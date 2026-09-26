@@ -93,6 +93,21 @@ it('removes and regenerates a planning\'s future séances with the new time when
     Carbon::setTestNow();
 });
 
+it('generates the new créneau\'s upcoming séances immediately', function () {
+    Carbon::setTestNow('2026-09-26 10:37:00'); // samedi, comme la correction #9
+    $coach = Coach::factory()->create();
+
+    $this->actingAs($this->admin)->post(route('admin.plannings.store'), [
+        'jour_semaine' => 1,
+        'heure_debut' => '17:00',
+        'coach_id' => $coach->id,
+    ]);
+
+    expect(Seance::where('coach_id', $coach->id)->whereDate('date', '2026-09-28')->where('statut', 'a_venir')->exists())->toBeTrue();
+
+    Carbon::setTestNow();
+});
+
 it('removes a planning\'s future séances when it is deactivated, and does not regenerate them', function () {
     Carbon::setTestNow('2026-09-22 08:00:00'); // a Tuesday
 

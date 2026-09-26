@@ -8,7 +8,7 @@ use App\Http\Requests\Admin\UpdatePlanningRequest;
 use App\Models\Coach;
 use App\Models\PlanningRepetition;
 use App\Models\Seance;
-use App\Services\SeanceGenerator;
+use App\Services\SeanceCycleDeVie;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -28,9 +28,11 @@ class PlanningController extends Controller
         return view('admin.plannings.create', compact('coaches'));
     }
 
-    public function store(StorePlanningRequest $request): RedirectResponse
+    public function store(StorePlanningRequest $request, SeanceCycleDeVie $cycleDeVie): RedirectResponse
     {
         PlanningRepetition::create($request->validated());
+
+        $cycleDeVie->synchroniser();
 
         return redirect()->route('admin.plannings.index')->with('message', 'Créneau ajouté.');
     }
@@ -77,8 +79,7 @@ class PlanningController extends Controller
             ->where('statut', 'a_venir')
             ->delete();
 
-        if ($planning->actif) {
-            app(SeanceGenerator::class)->genererPourLesProchainsJours();
-        }
+        // Le générateur ignore les créneaux inactifs : on peut toujours resynchroniser.
+        app(SeanceCycleDeVie::class)->synchroniser();
     }
 }

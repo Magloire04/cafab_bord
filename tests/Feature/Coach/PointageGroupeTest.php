@@ -8,6 +8,7 @@ use App\Models\Fille;
 use App\Models\Pointage;
 use App\Models\Seance;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 beforeEach(function () {
     $this->coach = Coach::factory()->create();
@@ -44,6 +45,24 @@ it('does not show a stale past-dated a_venir séance instead of the empty state'
 
     $response->assertOk();
     $response->assertViewHas('seance', null);
+});
+
+it('shows the coach\'s next séance even when it is on a later day', function () {
+    Carbon::setTestNow('2026-09-26 12:00:00');
+    $coach = Coach::factory()->create();
+    $lundi = Seance::factory()->create([
+        'coach_id' => $coach->id,
+        'statut' => StatutSeance::AVenir,
+        'date' => '2026-09-28',
+        'heure_prevue' => '17:00:00',
+    ]);
+
+    $this->actingAs($coach->user)
+        ->get(route('coach.seance'))
+        ->assertOk()
+        ->assertViewHas('seance', fn ($seance) => $seance?->is($lundi));
+
+    Carbon::setTestNow();
 });
 
 it('lets the coach mark a fille present who has not yet self-pointed', function () {
