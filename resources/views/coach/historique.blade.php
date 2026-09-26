@@ -17,7 +17,7 @@
             <tbody>
                 @forelse ($pointages as $pointage)
                     @php
-                        $minutesRetard = in_array($pointage->statut_ponctualite->value, ['en_retard', 'retard_fort'])
+                        $minutesRetard = in_array($pointage->statut_ponctualite->value, ['en_retard'])
                             ? $pointage->minutes_retard
                             : null;
                     @endphp

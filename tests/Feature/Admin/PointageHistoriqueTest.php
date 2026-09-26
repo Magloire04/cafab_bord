@@ -51,7 +51,7 @@ it('lets the admin correct a pointage with a mandatory motif', function () {
 });
 
 it('keeps the submitted minutes_retard when correcting to en_retard', function () {
-    $pointage = Pointage::factory()->create(['statut_ponctualite' => 'retard_fort', 'minutes_retard' => 25]);
+    $pointage = Pointage::factory()->create(['statut_ponctualite' => 'en_retard', 'minutes_retard' => 25]);
 
     $response = $this->actingAs($this->admin)->patch(route('admin.pointages.corriger', $pointage), [
         'statut_ponctualite' => 'en_retard',
@@ -89,4 +89,13 @@ it('rejects a correction without a motif', function () {
     ]);
 
     $response->assertSessionHasErrors('motif');
+});
+
+it('no longer offers the retard fort status in the correction form', function () {
+    Pointage::factory()->create();
+
+    $this->actingAs($this->admin)
+        ->get(route('admin.pointages.index'))
+        ->assertOk()
+        ->assertDontSee('Retard fort');
 });

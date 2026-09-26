@@ -14,7 +14,10 @@ use Illuminate\Support\Carbon;
 
 class PointageService
 {
-    public const SEUIL_RETARD_FORT_MINUTES = 15;
+    /**
+     * Minutes après l'heure prévue pendant lesquelles une arrivée compte encore « à l'heure ».
+     */
+    public const TOLERANCE_MINUTES = 10;
 
     public function pointer(
         Seance $seance,
@@ -76,14 +79,10 @@ class PointageService
     {
         $minutesEcart = (int) floor(($heureArrivee->getTimestamp() - $heurePrevue->getTimestamp()) / 60);
 
-        if ($minutesEcart <= 0) {
+        if ($minutesEcart <= self::TOLERANCE_MINUTES) {
             return [StatutPonctualite::ALHeure, 0];
         }
 
-        if ($minutesEcart <= self::SEUIL_RETARD_FORT_MINUTES) {
-            return [StatutPonctualite::EnRetard, $minutesEcart];
-        }
-
-        return [StatutPonctualite::RetardFort, $minutesEcart];
+        return [StatutPonctualite::EnRetard, $minutesEcart];
     }
 }

@@ -32,7 +32,7 @@ class PointageController extends Controller
 
         $minutesRetard = match ($statut) {
             StatutPonctualite::ALHeure, StatutPonctualite::Absent => 0,
-            StatutPonctualite::EnRetard, StatutPonctualite::RetardFort => $request->filled('minutes_retard')
+            StatutPonctualite::EnRetard => $request->filled('minutes_retard')
                 ? $request->validated('minutes_retard')
                 : $pointage->minutes_retard,
         };

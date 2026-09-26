@@ -41,7 +41,6 @@
                                 <select name="statut_ponctualite" class="field-select">
                                     <option value="a_l_heure">À l'heure</option>
                                     <option value="en_retard">En retard</option>
-                                    <option value="retard_fort">Retard fort</option>
                                     <option value="absent">Absent</option>
                                 </select>
                                 <input type="number" name="minutes_retard" class="field-control" placeholder="Minutes de retard" min="0">

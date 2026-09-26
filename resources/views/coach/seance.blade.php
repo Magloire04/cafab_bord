@@ -90,7 +90,7 @@
                         @foreach ($filles as $fille)
                             @php
                                 $pointage = $pointages->first(fn ($p) => $p->pointable_type === \App\Models\Fille::class && $p->pointable_id === $fille->id);
-                                $minutesRetard = $pointage && in_array($pointage->statut_ponctualite?->value, ['en_retard', 'retard_fort'])
+                                $minutesRetard = $pointage && in_array($pointage->statut_ponctualite?->value, ['en_retard'])
                                     ? $pointage->minutes_retard
                                     : null;
                             @endphp
