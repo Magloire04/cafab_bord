@@ -1,8 +1,9 @@
 <section>
     <header class="mb-3">
-        <h2 class="section-title mb-1">{{ __('Update Password') }}</h2>
+        <h2 class="section-title mb-1">Mot de passe</h2>
         <p class="field-hint mb-0">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
+            Au moins 8 caractères, avec des majuscules, des minuscules et des chiffres.
+            Changer de mot de passe déconnecte vos autres appareils.
         </p>
     </header>
 
@@ -11,29 +12,23 @@
         @method('put')
 
         <div class="mb-3">
-            <label for="update_password_current_password" class="field-label">{{ __('Current Password') }}</label>
-            <input id="update_password_current_password" name="current_password" type="password" class="field-control" autocomplete="current-password">
+            <label for="update_password_current_password" class="field-label">Mot de passe actuel</label>
+            <x-champ-mot-de-passe id="update_password_current_password" name="current_password" autocomplete="current-password" />
             @error('current_password', 'updatePassword') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="mb-3">
-            <label for="update_password_password" class="field-label">{{ __('New Password') }}</label>
-            <input id="update_password_password" name="password" type="password" class="field-control" autocomplete="new-password">
+            <label for="update_password_password" class="field-label">Nouveau mot de passe</label>
+            <x-champ-mot-de-passe id="update_password_password" name="password" autocomplete="new-password" />
             @error('password', 'updatePassword') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
         <div class="mb-3">
-            <label for="update_password_password_confirmation" class="field-label">{{ __('Confirm Password') }}</label>
-            <input id="update_password_password_confirmation" name="password_confirmation" type="password" class="field-control" autocomplete="new-password">
+            <label for="update_password_password_confirmation" class="field-label">Confirmer le nouveau mot de passe</label>
+            <x-champ-mot-de-passe id="update_password_password_confirmation" name="password_confirmation" autocomplete="new-password" />
             @error('password_confirmation', 'updatePassword') <div class="field-error">{{ $message }}</div> @enderror
         </div>
 
-        <div class="d-flex align-items-center gap-3">
-            <button type="submit" class="btn-ink">{{ __('Save') }}</button>
-
-            @if (session('status') === 'password-updated')
-                <p class="field-hint mb-0">{{ __('Saved.') }}</p>
-            @endif
-        </div>
+        <button type="submit" class="btn-ink">Changer le mot de passe</button>
     </form>
 </section>

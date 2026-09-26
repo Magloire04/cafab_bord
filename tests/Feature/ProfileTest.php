@@ -10,54 +10,83 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_profile_page_is_displayed(): void
+    public function test_profile_page_is_displayed_in_french(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->get('/profile');
-
-        $response->assertOk();
+        $this->actingAs($user)->get('/profile')
+            ->assertOk()
+            ->assertSee('Informations du profil')
+            ->assertSee('Mot de passe actuel')
+            ->assertDontSee('Update Password');
     }
 
-    public function test_profile_information_can_be_updated(): void
+    public function test_the_name_can_be_changed_without_the_password(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
-
-        $response
+        $this->actingAs($user)->patch('/profile', ['name' => 'Prudence Aïvodji', 'email' => $user->email])
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $user->refresh();
-
-        $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        $this->assertSame('Prudence Aïvodji', $user->fresh()->name);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
+    public function test_changing_the_email_requires_the_current_password(): void
+    {
+        $user = User::factory()->create(['email' => 'ancien@cafab.bj']);
+
+        $this->actingAs($user)->patch('/profile', ['name' => $user->name, 'email' => 'nouveau@cafab.bj'])
+            ->assertSessionHasErrors('current_password');
+
+        $this->assertSame('ancien@cafab.bj', $user->fresh()->email);
+    }
+
+    public function test_changing_the_email_with_a_wrong_password_is_refused(): void
+    {
+        $user = User::factory()->create(['email' => 'ancien@cafab.bj']);
+
+        $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => 'nouveau@cafab.bj',
+            'current_password' => 'mauvais',
+        ])->assertSessionHasErrors('current_password');
+
+        $this->assertSame('ancien@cafab.bj', $user->fresh()->email);
+    }
+
+    public function test_the_email_is_changed_normalized_with_the_current_password(): void
     {
         $user = User::factory()->create();
 
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'email' => $user->email,
-            ]);
+        $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => '  Nouveau@CAFAB.bj ',
+            'current_password' => 'password',
+        ])->assertSessionHasNoErrors()->assertRedirect('/profile');
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+        $this->assertSame('nouveau@cafab.bj', $user->fresh()->email);
+    }
 
-        $this->assertNotNull($user->refresh()->email_verified_at);
+    public function test_an_email_used_by_another_account_is_refused(): void
+    {
+        User::factory()->create(['email' => 'pris@cafab.bj']);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => 'Pris@cafab.bj',
+            'current_password' => 'password',
+        ])->assertSessionHasErrors('email');
+    }
+
+    public function test_saving_shows_a_french_confirmation(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->followingRedirects()
+            ->patch('/profile', ['name' => 'Nouveau nom', 'email' => $user->email])
+            ->assertSee('Profil enregistré.')
+            ->assertDontSee('profile-updated');
     }
 }
