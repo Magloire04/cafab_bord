@@ -50,7 +50,7 @@
             <div class="col-md-6">
                 <div class="content-card h-100">
                     <p class="section-title mb-2">Historique</p>
-                    <p class="field-hint mb-3">Consulte tes séances passées et ta ponctualité.</p>
+                    <p class="field-hint mb-3">Consultez vos séances passées et votre ponctualité.</p>
                     <a href="{{ route('coach.historique') }}" class="btn-outline">Voir mon historique</a>
                 </div>
             </div>
