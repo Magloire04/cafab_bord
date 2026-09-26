@@ -16,6 +16,7 @@ Deux besoins de suivi, jusqu'ici gérés à l'œil : savoir qui arrive à l'heur
 - [Configuration](#configuration)
 - [Comptes utilisateurs](#comptes-utilisateurs)
 - [Tâches planifiées](#tâches-planifiées)
+- [Déploiement](#déploiement)
 - [Tests](#tests)
 - [Structure du projet](#structure-du-projet)
 - [Documentation](#documentation)
@@ -139,6 +140,8 @@ Les variables principales de `.env` :
 
 En production, le jeton de service et l'URL de l'API sont à configurer avant le premier déploiement : sans eux, toute validation de cachet échoue à créer la dépense (l'échec est journalisé, la validation locale reste effective, et un nouvel essai reste possible depuis l'écran).
 
+En production, partir du modèle `.env.production.example` (voir [Déploiement](#déploiement)).
+
 ## Comptes utilisateurs
 
 Il n'y a pas d'écran d'inscription — les comptes Admin et Coach se créent en ligne de commande, avec un mot de passe généré affiché une seule fois :
@@ -152,13 +155,81 @@ Les codes PIN des coachs et des filles (mode kiosque) sont générés automatiqu
 
 ## Tâches planifiées
 
-Le cycle de vie des séances dépend du planificateur Laravel — à exécuter en continu en production (cron `* * * * * php artisan schedule:run`, ou `php artisan schedule:work` en développement) :
+Le cycle de vie des séances passe par le planificateur Laravel. En production, une tâche cron le lance chaque minute (ligne exacte dans [Déploiement](#déploiement)) ; en développement, `php artisan schedule:work`. Les pages de l'application font aussi avancer les séances, au plus une fois par minute (`SEANCES_SYNCHRONISATION_AUTO=true`) : le cron reste le filet de sécurité quand personne n'ouvre l'application.
 
 | Commande | Fréquence | Rôle |
 |---|---|---|
 | `seances:generer` | Quotidienne | Génère les séances à venir depuis le planning récurrent actif |
 | `seances:demarrer` | Chaque minute | Passe une séance `à_venir` en `en_cours` à l'heure prévue |
 | `seances:cloturer` | Chaque minute | Clôture automatiquement une séance oubliée par un coach ou jamais démarrée |
+
+## Déploiement
+
+Production : <https://presence.fillesdartsbenin.com>, sur le même hébergement mutualisé cPanel que Caisse CAFAB. Le principe est le même : chaque déploiement crée une version dans `releases/`, bascule dessus d'un coup, puis vérifie `/up`. Si la vérification échoue, le site revient seul à la version qui était en service.
+
+| Fichier | Rôle |
+|---|---|
+| `bin/deploy` | Se lance depuis votre machine : se connecte en SSH et exécute le script distant |
+| `deploy/deploy-shared-hosting.sh` | Copié sur le serveur en `deploy.sh` : déploie une branche |
+| `deploy/rollback-shared-hosting.sh` | Copié sur le serveur en `rollback.sh` : revient à la version précédente |
+
+Arborescence sur le serveur :
+
+```text
+~/presence.fillesdartsbenin.com/     racine du sous-domaine
+├── releases/<AAAAMMJJHHMMSS>/       une version par déploiement, 5 conservées
+├── shared/.env                       configuration de production
+├── shared/storage/                   fichiers et journaux, communs à toutes les versions
+├── shared/deploy.log                 journal des déploiements
+├── current -> releases/<…>          version en service
+└── deploy.sh, rollback.sh, index.php et le contenu de public/
+```
+
+### Commandes
+
+```bash
+export PRESENCE_DEPLOY_HOST=utilisateur@serveur                      # obligatoire
+export PRESENCE_DEPLOY_PORT=22                                       # optionnel
+export PRESENCE_DEPLOY_KEY="$HOME/.ssh/ma_cle"                        # optionnel
+export PRESENCE_DEPLOY_PHP_BIN=/opt/cpanel/ea-php83/root/usr/bin/php  # si le `php` du serveur est antérieur à 8.3
+
+bin/deploy              # déploie la branche main
+bin/deploy ma-branche   # déploie une autre branche
+bin/deploy rollback     # revient à la version précédente
+```
+
+Ces variables restent dans votre shell (par exemple `~/.bashrc`) et ne sont jamais versionnées.
+
+### Mise en ligne, la première fois
+
+1. **Caisse CAFAB d'abord.** Générer un jeton (`openssl rand -hex 32`), l'ajouter comme `PRESENCE_PAIEMENT_CAFAB_SERVICE_TOKEN` dans le `shared/.env` de Caisse CAFAB, puis la redéployer depuis `main` avec son propre `bin/deploy` (sa migration `external_reference` passe à cette occasion).
+2. **cPanel.** Créer le sous-domaine `presence.fillesdartsbenin.com` avec pour racine `~/presence.fillesdartsbenin.com`, une base MySQL et son utilisateur (jamais la base de Caisse CAFAB), la boîte `noreply@fillesdartsbenin.com`, le certificat AutoSSL, et choisir PHP 8.3 pour le sous-domaine.
+3. **Serveur (SSH).** Créer l'arborescence :
+
+   ```bash
+   mkdir -p ~/presence.fillesdartsbenin.com/{releases,shared/storage/app/public,shared/storage/framework/cache/data,shared/storage/framework/sessions,shared/storage/framework/views,shared/storage/logs}
+   ```
+
+   Depuis votre machine, copier le modèle de configuration et, une première fois, les scripts (ensuite, chaque déploiement met les scripts à jour) :
+
+   ```bash
+   scp -P 22 .env.production.example utilisateur@serveur:presence.fillesdartsbenin.com/shared/.env
+   scp -P 22 deploy/deploy-shared-hosting.sh utilisateur@serveur:presence.fillesdartsbenin.com/deploy.sh
+   scp -P 22 deploy/rollback-shared-hosting.sh utilisateur@serveur:presence.fillesdartsbenin.com/rollback.sh
+   ```
+
+   Sur le serveur, remplir dans `shared/.env` les valeurs `DB_*`, `MAIL_PASSWORD` et `CAISSE_CAFAB_API_TOKEN` (même jeton qu'à l'étape 1), puis `chmod 600 ~/presence.fillesdartsbenin.com/shared/.env`. Si le dépôt GitHub est privé, créer sur le serveur une clé de déploiement en lecture seule (`ssh-keygen`, puis `gh repo deploy-key add` ou l'interface GitHub) et la déclarer pour `github.com` dans `~/.ssh/config`.
+
+4. **Publication.** Fusionner `develop` dans `main` par une pull request, puis lancer `bin/deploy`.
+5. **Cron.** Ajouter dans cPanel, « Tâches Cron », la ligne affichée par le script, de la forme :
+   `* * * * * cd /home/<compte>/presence.fillesdartsbenin.com/current && php artisan schedule:run >> /dev/null 2>&1`
+   (remplacer `php` par le chemin de PHP 8.3 si vous avez réglé `PRESENCE_DEPLOY_PHP_BIN`).
+6. **Premier admin.** `cd ~/presence.fillesdartsbenin.com/current && php artisan users:create "Nom Complet" email@exemple.com --role=admin` ; le mot de passe provisoire s'affiche une seule fois.
+7. **Vérifications.** Connexion, email « mot de passe oublié », kiosque sur la tablette. La liaison avec Caisse CAFAB se vérifie sur le premier vrai cachet validé, pour ne pas créer de fausse dépense dans la comptabilité.
+
+### Retour arrière
+
+`bin/deploy rollback` revient à la version qui précède celle en service ; deux appels de suite reculent de deux versions. Le schéma de la base n'est jamais modifié : si la version abandonnée a introduit une migration incompatible, un `php artisan migrate:rollback` réfléchi, lancé à la main dans `current/`, reste nécessaire.
 
 ## Tests
 
@@ -193,10 +264,12 @@ Les documents de cadrage (note de cadrage, spécifications fonctionnelles, règl
 2. `2026-09-22-planning-pointage.md` — planning, séances, pointage, kiosque
 3. `2026-09-23-prestations-paiements.md` — prestations, cachets, intégration Caisse CAFAB
 4. `2026-09-23-rapports.md` — rapports de ponctualité et de dépenses
+5. `2026-09-26-corrections.md` — corrections après les premiers tests
+6. `2026-09-26-deploiement.md` — mise en production
 
 ## Statut du projet
 
-Les quatre incréments prévus par la note de cadrage sont fusionnés dans `develop`. Chaque incrément est passé par une revue par tâche puis une revue finale de branche entière avant fusion.
+Les quatre incréments prévus par la note de cadrage sont fusionnés dans `develop`, ainsi que la refonte visuelle, les corrections issues des premiers tests et la préparation de la mise en production. Chaque incrément est passé par une revue par tâche puis une revue finale de branche entière avant fusion.
 
 Points encore ouverts, signalés comme hypothèses de travail dans les documents de cadrage :
 
