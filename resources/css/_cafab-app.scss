@@ -690,3 +690,33 @@ textarea.field-control {
   color: var(--ink);
   border-bottom-color: var(--accent);
 }
+
+/* Menu « … » des tableaux */
+.menu-actions-declencheur {
+  min-width: 40px;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+.menu-actions {
+  border-radius: var(--r-btn);
+  padding: 6px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.menu-actions .dropdown-item {
+  border-radius: var(--r-btn-sm);
+  padding: 8px 12px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Fenêtres modales (confirmation, formulaires de cachet) */
+.modale-cafab {
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  font-family: var(--font-body);
+  color: var(--ink);
+}

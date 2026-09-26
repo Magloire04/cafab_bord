@@ -20,7 +20,7 @@
                     <th>Heure</th>
                     <th>Coach référent</th>
                     <th>Statut</th>
-                    <th>Actions</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,18 +36,19 @@
                                 <span class="badge-st st-absent">Inactif</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="text-end">
                             @can('update', $planning)
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <a href="{{ route('plannings.edit', $planning) }}" class="btn-outline btn-sm">Modifier</a>
-                                    <form action="{{ route('plannings.toggle-actif', $planning) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn-sm {{ $planning->actif ? 'btn-danger-outline' : 'btn-success' }}">
-                                            {{ $planning->actif ? 'Désactiver' : 'Réactiver' }}
-                                        </button>
-                                    </form>
-                                </div>
+                                <x-menu-actions>
+                                    <li><a class="dropdown-item" href="{{ route('plannings.edit', $planning) }}">Modifier</a></li>
+                                    <li>
+                                        <form action="{{ route('plannings.toggle-actif', $planning) }}" method="POST"
+                                              data-confirmer="{{ $planning->actif ? 'Désactiver' : 'Réactiver' }} le créneau du {{ $planning->jour_semaine->libelle() }} ?">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="dropdown-item">{{ $planning->actif ? 'Désactiver' : 'Réactiver' }}</button>
+                                        </form>
+                                    </li>
+                                </x-menu-actions>
                             @else
                                 <span class="field-hint">—</span>
                             @endcan

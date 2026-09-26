@@ -109,6 +109,14 @@ it('refuses to let a coach deactivate a fille', function () {
     expect($fille->fresh()->statut)->toBe(StatutPersonne::Actif);
 });
 
+it('offers the admin the deactivation in the row menu', function () {
+    Fille::factory()->create(['statut' => 'actif']);
+
+    $this->actingAs($this->admin)->get(route('filles.index'))
+        ->assertSee('Désactiver')
+        ->assertSee('Régénérer le PIN');
+});
+
 it('does not offer the deactivation to a coach', function () {
     $coach = Coach::factory()->create();
     Fille::factory()->create(['statut' => 'actif']);

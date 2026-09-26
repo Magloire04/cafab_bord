@@ -21,7 +21,7 @@
                     <th>Contact</th>
                     <th>PIN</th>
                     <th>Statut</th>
-                    <th>Actions</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,24 +38,28 @@
                                 <span class="badge-st st-absent">{{ $fille->statut->value }}</span>
                             @endif
                         </td>
-                        <td>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ route('filles.edit', $fille) }}" class="btn-outline btn-sm">Modifier</a>
+                        <td class="text-end">
+                            <x-menu-actions>
+                                <li><a class="dropdown-item" href="{{ route('filles.edit', $fille) }}">Modifier</a></li>
                                 @can('toggleStatut', $fille)
-                                    <form action="{{ route('filles.toggle-statut', $fille) }}" method="POST" class="d-inline">
+                                    <li>
+                                        <form action="{{ route('filles.toggle-statut', $fille) }}" method="POST"
+                                              data-confirmer="{{ $fille->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }} la fiche de {{ $fille->prenom }} {{ $fille->nom }} ?">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="dropdown-item">{{ $fille->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}</button>
+                                        </form>
+                                    </li>
+                                @endcan
+                                <li>
+                                    <form action="{{ route('filles.regenerate-pin', $fille) }}" method="POST"
+                                          data-confirmer="Générer un nouveau code PIN pour {{ $fille->prenom }} ? L'ancien ne fonctionnera plus au kiosque.">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn-sm {{ $fille->statut->value === 'actif' ? 'btn-danger-outline' : 'btn-success' }}">
-                                            {{ $fille->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
-                                        </button>
+                                        <button type="submit" class="dropdown-item">Régénérer le PIN</button>
                                     </form>
-                                @endcan
-                                <form action="{{ route('filles.regenerate-pin', $fille) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn-outline btn-sm">Régénérer le PIN</button>
-                                </form>
-                            </div>
+                                </li>
+                            </x-menu-actions>
                         </td>
                     </tr>
                 @endforeach

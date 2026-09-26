@@ -9,11 +9,12 @@ use App\Http\Requests\Admin\StoreCoachRequest;
 use App\Http\Requests\Admin\UpdateCoachRequest;
 use App\Models\Coach;
 use App\Models\User;
+use App\Services\ChangementMotDePasse;
+use App\Services\GenerateurMotDePasse;
 use App\Services\PinGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CoachController extends Controller
@@ -25,19 +26,20 @@ class CoachController extends Controller
         return view('admin.coaches.index', compact('coaches'));
     }
 
-    public function create(): View
+    public function create(GenerateurMotDePasse $generateur): View
     {
-        return view('admin.coaches.create');
+        return view('admin.coaches.create', ['motDePasse' => $generateur->generer()]);
     }
 
     public function store(StoreCoachRequest $request, PinGenerator $pinGenerator): RedirectResponse
     {
         DB::transaction(function () use ($request, $pinGenerator) {
             $user = User::create([
-                'name' => $request->string('name'),
-                'email' => $request->string('email'),
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
                 'role' => UserRole::Coach,
-                'password' => Hash::make(Str::password(16)),
+                'password' => Hash::make($request->validated('password')),
+                'must_change_password' => true,
             ]);
 
             Coach::create([
@@ -48,7 +50,13 @@ class CoachController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.coaches.index')->with('message', 'Coach ajouté.');
+        return redirect()->route('admin.coaches.index')
+            ->with('message', 'Coach ajouté.')
+            ->with('identifiants', [
+                'nom' => $request->validated('name'),
+                'email' => $request->validated('email'),
+                'mot_de_passe' => $request->validated('password'),
+            ]);
     }
 
     public function edit(Coach $coach): View
@@ -58,10 +66,17 @@ class CoachController extends Controller
 
     public function update(UpdateCoachRequest $request, Coach $coach): RedirectResponse
     {
-        $coach->update([
-            'contact' => $request->string('contact')->value() ?: null,
-            'date_entree' => $request->date('date_entree'),
-        ]);
+        DB::transaction(function () use ($request, $coach) {
+            $coach->user->update([
+                'name' => $request->validated('name'),
+                'email' => $request->validated('email'),
+            ]);
+
+            $coach->update([
+                'contact' => $request->string('contact')->value() ?: null,
+                'date_entree' => $request->date('date_entree'),
+            ]);
+        });
 
         return redirect()->route('admin.coaches.index')->with('message', 'Coach mis à jour.');
     }
@@ -82,5 +97,19 @@ class CoachController extends Controller
         $coach->update(['pin' => $pinGenerator->generate()]);
 
         return redirect()->route('admin.coaches.index')->with('message', 'Nouveau code PIN généré.');
+    }
+
+    public function resetPassword(Coach $coach, GenerateurMotDePasse $generateur, ChangementMotDePasse $changement): RedirectResponse
+    {
+        $motDePasse = $generateur->generer();
+        $changement->imposerProvisoire($coach->user, $motDePasse);
+
+        return redirect()->route('admin.coaches.index')
+            ->with('message', 'Mot de passe réinitialisé. Les sessions du coach ont été fermées.')
+            ->with('identifiants', [
+                'nom' => $coach->user->name,
+                'email' => $coach->user->email,
+                'mot_de_passe' => $motDePasse,
+            ]);
     }
 }

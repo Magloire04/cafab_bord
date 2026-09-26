@@ -13,6 +13,19 @@
                     @method('PUT')
 
                     <div class="mb-3">
+                        <label for="name" class="field-label">Nom complet</label>
+                        <input id="name" name="name" type="text" class="field-control" value="{{ old('name', $coach->user->name) }}" required>
+                        @error('name') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="field-label">E-mail</label>
+                        <input id="email" name="email" type="email" class="field-control" value="{{ old('email', $coach->user->email) }}" required>
+                        <p class="field-hint">Le coach se connectera avec cette adresse.</p>
+                        @error('email') <p class="field-error">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="mb-3">
                         <label for="contact" class="field-label">Contact</label>
                         <input id="contact" name="contact" type="text" class="field-control" value="{{ old('contact', $coach->contact) }}">
                     </div>

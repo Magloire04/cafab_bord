@@ -97,5 +97,20 @@
             </div>
         </main>
     </div>
+
+    <div class="modal fade" id="modale-confirmation" tabindex="-1" aria-labelledby="modale-confirmation-titre" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modale-cafab">
+                <div class="modal-body">
+                    <h2 class="section-title mb-2" id="modale-confirmation-titre">Confirmation</h2>
+                    <p class="mb-0" data-confirmation-message></p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-outline btn-sm" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn-ink btn-sm" data-confirmation-valider>Confirmer</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

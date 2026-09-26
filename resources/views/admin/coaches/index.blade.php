@@ -11,6 +11,17 @@
 
     <x-onglets.registre />
 
+    @if ($identifiants = session('identifiants'))
+        <div class="callout-info mb-4">
+            <div>
+                <p class="fw-bold mb-1">Identifiants à transmettre à {{ $identifiants['nom'] }}</p>
+                <p class="mb-1">Email : <span class="mono">{{ $identifiants['email'] }}</span> · Mot de passe provisoire : <span class="mono">{{ $identifiants['mot_de_passe'] }}</span></p>
+                <p class="field-hint mb-0">Ce mot de passe ne sera plus affiché. Le coach devra le changer à sa première connexion.</p>
+            </div>
+            <button type="button" class="btn-outline btn-sm" data-copier="Email : {{ $identifiants['email'] }} · Mot de passe : {{ $identifiants['mot_de_passe'] }}">Copier</button>
+        </div>
+    @endif
+
     <div class="table-card">
         <table>
             <thead>
@@ -20,7 +31,7 @@
                     <th>Contact</th>
                     <th>PIN</th>
                     <th>Statut</th>
-                    <th>Actions</th>
+                    <th class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,22 +48,34 @@
                                 <span class="badge-st st-absent">{{ $coach->statut->value }}</span>
                             @endif
                         </td>
-                        <td>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ route('admin.coaches.edit', $coach) }}" class="btn-outline btn-sm">Modifier</a>
-                                <form action="{{ route('admin.coaches.toggle-statut', $coach) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn-sm {{ $coach->statut->value === 'actif' ? 'btn-danger-outline' : 'btn-success' }}">
-                                        {{ $coach->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
-                                    </button>
-                                </form>
-                                <form action="{{ route('admin.coaches.regenerate-pin', $coach) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn-outline btn-sm">Régénérer le PIN</button>
-                                </form>
-                            </div>
+                        <td class="text-end">
+                            <x-menu-actions>
+                                <li><a class="dropdown-item" href="{{ route('admin.coaches.edit', $coach) }}">Modifier</a></li>
+                                <li>
+                                    <form action="{{ route('admin.coaches.toggle-statut', $coach) }}" method="POST"
+                                          data-confirmer="{{ $coach->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }} le compte de {{ $coach->user->name }} ?">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="dropdown-item">{{ $coach->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ route('admin.coaches.regenerate-pin', $coach) }}" method="POST"
+                                          data-confirmer="Générer un nouveau code PIN pour {{ $coach->user->name }} ? L'ancien ne fonctionnera plus au kiosque.">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="dropdown-item">Régénérer le PIN</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ route('admin.coaches.reset-password', $coach) }}" method="POST"
+                                          data-confirmer="Réinitialiser le mot de passe de {{ $coach->user->name }} ? Ses sessions seront fermées et il devra choisir un nouveau mot de passe.">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="dropdown-item">Réinitialiser le mot de passe</button>
+                                    </form>
+                                </li>
+                            </x-menu-actions>
                         </td>
                     </tr>
                 @endforeach

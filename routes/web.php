@@ -61,6 +61,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('coaches.toggle-statut');
     Route::patch('coaches/{coach}/regenerate-pin', [CoachController::class, 'regeneratePin'])
         ->name('coaches.regenerate-pin');
+    Route::patch('coaches/{coach}/reset-password', [CoachController::class, 'resetPassword'])
+        ->name('coaches.reset-password');
 
     Route::get('calendrier', [CalendrierController::class, 'index'])->name('calendrier');
 
