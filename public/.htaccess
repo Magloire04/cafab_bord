@@ -5,6 +5,18 @@
 
     RewriteEngine On
 
+    # Production (cPanel) : ce fichier est recopie a la racine du sous-domaine,
+    # qui contient aussi les dossiers du deploiement. Ils ne sont jamais servis.
+    RewriteRule ^(shared|releases|current)(/|$) - [F,L]
+    RewriteRule ^(deploy|rollback)\.sh$ - [F,L]
+
+    # Production : toujours en HTTPS, les cookies de session etant reserves a
+    # HTTPS. .well-known reste accessible en HTTP pour le certificat de cPanel.
+    RewriteCond %{HTTP_HOST} ^presence\.fillesdartsbenin\.com$ [NC]
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

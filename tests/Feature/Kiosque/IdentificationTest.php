@@ -58,10 +58,11 @@ it('rejects an unknown pin with an error, no redirect to the menu', function () 
     expect(session('kiosque.identifie'))->toBeNull();
 });
 
-it('rate-limits repeated pin attempts', function () {
+it('rate-limits repeated pin attempts and says so on the kiosk', function () {
     for ($i = 0; $i < 21; $i++) {
         $response = $this->post(route('kiosque.identifier'), ['pin' => '0000']);
     }
 
-    $response->assertStatus(429);
+    $response->assertRedirect(route('kiosque.home'))
+        ->assertSessionHasErrors(['pin' => "Trop d'essais en peu de temps. Attends une minute puis réessaie."]);
 });

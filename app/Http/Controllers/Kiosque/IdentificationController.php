@@ -8,8 +8,10 @@ use App\Models\Fille;
 use App\Models\Seance;
 use App\Services\EtatSeances;
 use App\Services\KioskIdentifier;
+use App\Services\VerrouKiosque;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class IdentificationController extends Controller
@@ -27,14 +29,29 @@ class IdentificationController extends Controller
         ]);
     }
 
-    public function identifier(Request $request, KioskIdentifier $identifier): RedirectResponse
+    public function identifier(Request $request, KioskIdentifier $identifier, VerrouKiosque $verrou): RedirectResponse
     {
-        $request->validate(['pin' => ['required', 'string', 'size:4']]);
+        $ip = (string) $request->ip();
 
-        $personne = $identifier->identifier($request->string('pin')->value());
+        if ($verrou->estBloque($ip)) {
+            return redirect()->route('kiosque.home')->withErrors(['pin' => $verrou->messageBlocage($ip)]);
+        }
+
+        // Pas de $request->validate() : il renverrait avant le compteur, alors
+        // qu'un code au mauvais format compte aussi comme un code faux.
+        $validation = Validator::make($request->only('pin'), ['pin' => ['required', 'string', 'size:4']]);
+        $personne = $validation->fails() ? null : $identifier->identifier($request->string('pin')->value());
 
         if (! $personne) {
-            return redirect()->route('kiosque.home')->withErrors(['pin' => 'Code inconnu.']);
+            $verrou->enregistrerEchec($ip);
+
+            $message = match (true) {
+                $verrou->estBloque($ip) => $verrou->messageBlocage($ip),
+                $validation->fails() => $validation->errors()->first('pin'),
+                default => 'Code inconnu.',
+            };
+
+            return redirect()->route('kiosque.home')->withErrors(['pin' => $message]);
         }
 
         $request->session()->put('kiosque.identifie', [

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Commande unique de deploiement de presence-paiement-cafab (CAFAB), lancee
+# depuis la machine du developpeur : elle fait le SSH a votre place.
+# Reprise de caisse-depenses/bin/deploy, avec ses propres variables.
+#
+# Configuration (variables d'environnement, JAMAIS versionnees - a definir
+# dans votre shell local, ex. ~/.bashrc) :
+#   PRESENCE_DEPLOY_HOST     utilisateur@hote (obligatoire)
+#   PRESENCE_DEPLOY_PORT     port SSH (defaut : 22)
+#   PRESENCE_DEPLOY_KEY      chemin de la cle privee SSH (optionnel)
+#   PRESENCE_DEPLOY_APP_DIR  dossier distant, relatif a ~ (defaut : presence.fillesdartsbenin.com)
+#   PRESENCE_DEPLOY_PHP_BIN  PHP 8.4.1 ou plus du serveur, si `php` y est plus ancien (optionnel)
+#
+# Usage :
+#   bin/deploy              -> deploie la branche main
+#   bin/deploy ma-branche   -> deploie une autre branche
+#   bin/deploy rollback     -> revient a la version precedente
+set -euo pipefail
+
+if [[ -z "${PRESENCE_DEPLOY_HOST:-}" ]]; then
+  echo "ERREUR: variable PRESENCE_DEPLOY_HOST non definie (ex. export PRESENCE_DEPLOY_HOST=utilisateur@serveur)." >&2
+  exit 1
+fi
+
+HOST="${PRESENCE_DEPLOY_HOST}"
+PORT="${PRESENCE_DEPLOY_PORT:-22}"
+REMOTE_APP_DIR="${PRESENCE_DEPLOY_APP_DIR:-presence.fillesdartsbenin.com}"
+ARG="${1:-main}"
+
+# Ces valeurs sont recopiees dans la commande distante : on refuse tout
+# caractere qui permettrait d'y glisser une autre commande.
+SUR='^[A-Za-z0-9._/-]+$'
+if [[ ! "${ARG}" =~ ${SUR} ]]; then
+  echo "ERREUR: nom de branche invalide (${ARG}). Caracteres permis : lettres, chiffres, . _ / -" >&2
+  exit 1
+fi
+if [[ ! "${REMOTE_APP_DIR}" =~ ${SUR} ]]; then
+  echo "ERREUR: PRESENCE_DEPLOY_APP_DIR invalide (${REMOTE_APP_DIR})." >&2
+  exit 1
+fi
+
+ENV_DISTANT=""
+if [[ -n "${PRESENCE_DEPLOY_PHP_BIN:-}" ]]; then
+  if [[ ! "${PRESENCE_DEPLOY_PHP_BIN}" =~ ${SUR} ]]; then
+    echo "ERREUR: PRESENCE_DEPLOY_PHP_BIN invalide (${PRESENCE_DEPLOY_PHP_BIN})." >&2
+    exit 1
+  fi
+  ENV_DISTANT="PHP_BIN='${PRESENCE_DEPLOY_PHP_BIN}' "
+fi
+
+SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=10 -p "${PORT}")
+if [[ -n "${PRESENCE_DEPLOY_KEY:-}" ]]; then
+  SSH_OPTS+=(-i "${PRESENCE_DEPLOY_KEY}")
+fi
+
+if [[ "${ARG}" == "rollback" ]]; then
+  echo "-> Retour a la version precedente sur ${HOST}..."
+  ssh "${SSH_OPTS[@]}" "${HOST}" "bash ~/${REMOTE_APP_DIR}/rollback.sh"
+else
+  echo "-> Deploiement de la branche '${ARG}' sur ${HOST}..."
+  ssh "${SSH_OPTS[@]}" "${HOST}" "${ENV_DISTANT}BRANCH='${ARG}' bash ~/${REMOTE_APP_DIR}/deploy.sh"
+fi
+
+echo "OK termine."
