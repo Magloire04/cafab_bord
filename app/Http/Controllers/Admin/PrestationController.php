@@ -58,7 +58,19 @@ class PrestationController extends Controller
     {
         $prestation->load(['cachets.fille', 'cachets.valideParUser', 'cachets.corrigeParUser']);
 
-        return view('admin.prestations.show', compact('prestation'));
+        // Mêmes définitions que l'écran Paiements : les cachets annulés ne comptent pas.
+        $cachets = $prestation->cachets->reject(fn (Cachet $cachet) => $cachet->statut === StatutCachet::Annule);
+        $totalDu = (float) $cachets->sum(fn (Cachet $cachet) => (float) $cachet->montant);
+        $valide = (float) $cachets->where('statut', StatutCachet::ValideePayee)->sum(fn (Cachet $cachet) => (float) $cachet->montant);
+
+        $indicateurs = [
+            'total_du' => $totalDu,
+            'valide' => $valide,
+            'reste' => $totalDu - $valide,
+            'a_traiter' => $cachets->whereIn('statut', [StatutCachet::DeclareePayee, StatutCachet::DeclareeNonPayee])->count(),
+        ];
+
+        return view('admin.prestations.show', compact('prestation', 'indicateurs'));
     }
 
     public function annuler(Prestation $prestation): RedirectResponse

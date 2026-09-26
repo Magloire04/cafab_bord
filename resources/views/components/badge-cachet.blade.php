@@ -1,4 +1,4 @@
-@props(['statut'])
+@props(['statut', 'detail' => null])
 
 @php
     $config = match ($statut?->value ?? $statut) {
@@ -12,5 +12,5 @@
 @endphp
 
 <span {{ $attributes->merge(['class' => 'badge-st '.$config['class']]) }}>
-    {{ $config['label'] }}
+    {{ $config['label'] }}{{ $detail ? ' · '.$detail : '' }}
 </span>

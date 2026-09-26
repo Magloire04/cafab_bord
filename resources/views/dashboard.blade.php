@@ -33,27 +33,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="row g-3">
-            <div class="col-md-4">
-                <a href="{{ route('admin.pointages.index') }}" class="link-tile">
-                    <p class="link-tile-title">Pointages</p>
-                    <p class="link-tile-desc">{{ $stats['seancesEnCours'] }} séance(s) en cours actuellement.</p>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="{{ route('admin.paiements.index') }}" class="link-tile">
-                    <p class="link-tile-title">Paiements</p>
-                    <p class="link-tile-desc">{{ $stats['cachetsAValider'] }} cachet(s) déclaré(s) à valider.</p>
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="{{ route('admin.rapports.index') }}" class="link-tile">
-                    <p class="link-tile-title">Rapports</p>
-                    <p class="link-tile-desc">Ponctualité et dépenses de prestations, exportables en Excel.</p>
-                </a>
-            </div>
-        </div>
     @else
         <div class="row g-3">
             <div class="col-md-6">
