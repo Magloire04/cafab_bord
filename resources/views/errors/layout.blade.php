@@ -20,7 +20,9 @@
             <p class="field-hint mb-4">@yield('message')</p>
 
             @unless ($sansRetour ?? false)
-                <a href="{{ url('/') }}" class="btn-ink w-100 justify-content-center">{{ "Retour à l'accueil" }}</a>
+                {{-- Sur la tablette du kiosque, l'accueil est l'écran du code, pas la connexion. --}}
+                <a href="{{ request()->is('kiosque', 'kiosque/*') ? route('kiosque.home') : url('/') }}"
+                   class="btn-ink w-100 justify-content-center">{{ "Retour à l'accueil" }}</a>
             @endunless
         </div>
     </div>

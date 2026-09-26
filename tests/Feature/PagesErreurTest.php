@@ -65,13 +65,41 @@ it('shows a French 503 page without the way back', function () {
         ->assertDontSee("Retour à l'accueil");
 });
 
-it('renders every error page without querying the database', function (int $code) {
+it('shows a French page for any other client error, such as a wrong HTTP method', function () {
+    config(['app.debug' => false]);
+
+    $this->get('/logout')
+        ->assertStatus(405)
+        ->assertSee('Requête impossible')
+        ->assertSee("Cette action n'est pas possible depuis cette page.");
+});
+
+it('shows a French page for any other server error', function () {
+    config(['app.debug' => false]);
+    Route::get('/essai-passerelle', fn () => abort(502));
+
+    $this->get('/essai-passerelle')
+        ->assertStatus(502)
+        ->assertSee('Service indisponible')
+        ->assertSee('Le service ne répond pas pour le moment. Réessayez dans un instant.');
+});
+
+it('points the kiosk error pages back to the kiosk, not to the login screen', function () {
+    $this->get('/kiosque/adresse-inconnue')
+        ->assertNotFound()
+        ->assertSee('href="'.route('kiosque.home').'"', false);
+
+    $this->get('/cette-page-n-existe-pas')
+        ->assertSee('href="'.url('/').'"', false);
+});
+
+it('renders every error page without querying the database', function (string $vue) {
     DB::enableQueryLog();
 
-    view("errors.{$code}")->render();
+    view("errors.{$vue}")->render();
 
     expect(DB::getQueryLog())->toBeEmpty();
-})->with([403, 404, 419, 429, 500, 503]);
+})->with(['403', '404', '419', '429', '500', '503', '4xx', '5xx']);
 
 it('sends the kiosk back to the code screen when its page has expired', function () {
     Route::middleware('web')->post('/kiosque/essai-page-expiree', fn () => throw new TokenMismatchException);

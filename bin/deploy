@@ -9,7 +9,7 @@
 #   PRESENCE_DEPLOY_PORT     port SSH (defaut : 22)
 #   PRESENCE_DEPLOY_KEY      chemin de la cle privee SSH (optionnel)
 #   PRESENCE_DEPLOY_APP_DIR  dossier distant, relatif a ~ (defaut : presence.fillesdartsbenin.com)
-#   PRESENCE_DEPLOY_PHP_BIN  PHP 8.3 du serveur, si `php` y est plus ancien (optionnel)
+#   PRESENCE_DEPLOY_PHP_BIN  PHP 8.4.1 ou plus du serveur, si `php` y est plus ancien (optionnel)
 #
 # Usage :
 #   bin/deploy              -> deploie la branche main

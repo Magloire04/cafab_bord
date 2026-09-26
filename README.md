@@ -74,7 +74,7 @@ Caisse CAFAB continue de couvrir les entrées et dépenses générales de l'asso
 
 ## Stack technique
 
-- **PHP 8.3+**, **Laravel 12**
+- **PHP 8.4.1+** (exigé par les dépendances verrouillées), **Laravel 12**
 - **Blade** + **Alpine.js** (pas de framework front lourd)
 - **SQLite** en développement, **MySQL** en production
 - **Pest** pour les tests, **Laravel Pint** pour le formatage
@@ -106,7 +106,7 @@ L'application ne touche jamais directement la base de données de Caisse CAFAB.
 
 ## Installation
 
-Prérequis : PHP 8.3+, Composer, Node.js/npm.
+Prérequis : PHP 8.4.1+, Composer, Node.js/npm.
 
 ```bash
 git clone https://github.com/Magloire04/cafab_bord.git presence-paiement-cafab
@@ -185,13 +185,15 @@ Arborescence sur le serveur :
 └── deploy.sh, rollback.sh, index.php et le contenu de public/
 ```
 
+`shared/`, `releases/` et `current/` ne sont jamais servis en HTTP : le script y écrit un `.htaccess` qui refuse tout accès, et le `.htaccess` de la racine les bloque aussi. Les fichiers que cPanel place à la racine (`.user.ini`, `php.ini`, `error_log`, `.well-known/`, le bloc PHP de « MultiPHP Manager » dans `.htaccess`) sont conservés d'un déploiement à l'autre. Seules les versions dont la vérification a réussi servent de cible à un retour arrière ; une version ratée est supprimée.
+
 ### Commandes
 
 ```bash
 export PRESENCE_DEPLOY_HOST=utilisateur@serveur                      # obligatoire
 export PRESENCE_DEPLOY_PORT=22                                       # optionnel
 export PRESENCE_DEPLOY_KEY="$HOME/.ssh/ma_cle"                        # optionnel
-export PRESENCE_DEPLOY_PHP_BIN=/opt/cpanel/ea-php83/root/usr/bin/php  # si le `php` du serveur est antérieur à 8.3
+export PRESENCE_DEPLOY_PHP_BIN=/opt/cpanel/ea-php84/root/usr/bin/php  # si le `php` du serveur est antérieur à 8.4.1
 
 bin/deploy              # déploie la branche main
 bin/deploy ma-branche   # déploie une autre branche
@@ -203,7 +205,7 @@ Ces variables restent dans votre shell (par exemple `~/.bashrc`) et ne sont jama
 ### Mise en ligne, la première fois
 
 1. **Caisse CAFAB d'abord.** Générer un jeton (`openssl rand -hex 32`), l'ajouter comme `PRESENCE_PAIEMENT_CAFAB_SERVICE_TOKEN` dans le `shared/.env` de Caisse CAFAB, puis la redéployer depuis `main` avec son propre `bin/deploy` (sa migration `external_reference` passe à cette occasion).
-2. **cPanel.** Créer le sous-domaine `presence.fillesdartsbenin.com` avec pour racine `~/presence.fillesdartsbenin.com`, une base MySQL et son utilisateur (jamais la base de Caisse CAFAB), la boîte `noreply@fillesdartsbenin.com`, le certificat AutoSSL, et choisir PHP 8.3 pour le sous-domaine.
+2. **cPanel.** Créer le sous-domaine `presence.fillesdartsbenin.com` avec pour racine `~/presence.fillesdartsbenin.com`, une base MySQL et son utilisateur (jamais la base de Caisse CAFAB), la boîte `noreply@fillesdartsbenin.com`, le certificat AutoSSL, et choisir PHP 8.4 (ou plus récent) pour le sous-domaine dans « MultiPHP Manager ». La redirection de HTTP vers HTTPS est faite par le `.htaccess` du site : inutile de l'activer dans cPanel.
 3. **Serveur (SSH).** Créer l'arborescence :
 
    ```bash
@@ -223,9 +225,18 @@ Ces variables restent dans votre shell (par exemple `~/.bashrc`) et ne sont jama
 4. **Publication.** Fusionner `develop` dans `main` par une pull request, puis lancer `bin/deploy`.
 5. **Cron.** Ajouter dans cPanel, « Tâches Cron », la ligne affichée par le script, de la forme :
    `* * * * * cd /home/<compte>/presence.fillesdartsbenin.com/current && php artisan schedule:run >> /dev/null 2>&1`
-   (remplacer `php` par le chemin de PHP 8.3 si vous avez réglé `PRESENCE_DEPLOY_PHP_BIN`).
+   (remplacer `php` par le chemin de PHP 8.4 si vous avez réglé `PRESENCE_DEPLOY_PHP_BIN`).
 6. **Premier admin.** `cd ~/presence.fillesdartsbenin.com/current && php artisan users:create "Nom Complet" email@exemple.com --role=admin` ; le mot de passe provisoire s'affiche une seule fois.
-7. **Vérifications.** Connexion, email « mot de passe oublié », kiosque sur la tablette. La liaison avec Caisse CAFAB se vérifie sur le premier vrai cachet validé, pour ne pas créer de fausse dépense dans la comptabilité.
+7. **Vérifications.** Connexion, email « mot de passe oublié », kiosque sur la tablette. La liaison avec Caisse CAFAB se vérifie sur le premier vrai cachet validé, pour ne pas créer de fausse dépense dans la comptabilité. Vérifier aussi que les dossiers du déploiement ne sont pas servis et que HTTP redirige vers HTTPS :
+
+   ```bash
+   curl -s -o /dev/null -w '%{http_code}
+' https://presence.fillesdartsbenin.com/shared/deploy.log      # 403 attendu
+   curl -s -o /dev/null -w '%{http_code}
+' https://presence.fillesdartsbenin.com/current/composer.json  # 403 attendu
+   curl -s -o /dev/null -w '%{http_code} %{redirect_url}
+' http://presence.fillesdartsbenin.com/login     # 301 vers https://
+   ```
 
 ### Retour arrière
 
@@ -236,6 +247,12 @@ Ces variables restent dans votre shell (par exemple `~/.bashrc`) et ne sont jama
 ```bash
 vendor/bin/pest          # suite complète
 vendor/bin/pint --test   # vérification du formatage
+```
+
+Les scripts de déploiement ont leur banc d'essai, à lancer dans un conteneur Linux jetable (Docker) :
+
+```bash
+docker run --rm -v "$PWD":/app:ro -w /app nginx:stable bash tests/deploy/scenarios.sh
 ```
 
 ## Structure du projet
