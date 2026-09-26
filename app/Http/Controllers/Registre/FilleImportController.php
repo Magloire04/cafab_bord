@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Registre;
 
 use App\Http\Controllers\Controller;
 use App\Imports\FillesPreviewImport;
@@ -15,7 +15,7 @@ class FilleImportController extends Controller
 {
     public function form(): View
     {
-        return view('admin.filles.import');
+        return view('registre.filles.import');
     }
 
     public function preview(Request $request): View
@@ -37,7 +37,7 @@ class FilleImportController extends Controller
 
         $request->session()->put('import_filles_rows', $rows);
 
-        return view('admin.filles.import-preview', ['rows' => $rows]);
+        return view('registre.filles.import-preview', ['rows' => $rows]);
     }
 
     public function confirm(Request $request, PinGenerator $pinGenerator): RedirectResponse
@@ -67,6 +67,6 @@ class FilleImportController extends Controller
 
         $request->session()->forget('import_filles_rows');
 
-        return redirect()->route('admin.filles.index')->with('message', 'Import terminé.');
+        return redirect()->route('filles.index')->with('message', 'Import terminé.');
     }
 }

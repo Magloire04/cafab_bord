@@ -5,7 +5,7 @@
         </div>
     </x-slot>
 
-    <form action="{{ route('admin.filles.import.confirm') }}" method="POST">
+    <form action="{{ route('filles.import.confirm') }}" method="POST">
         @csrf
 
         <div class="table-card mb-4">

@@ -5,10 +5,12 @@
             <p class="field-hint mb-0">Gérez les comptes et statuts des filles.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.filles.import') }}" class="btn-outline">Importer depuis Excel</a>
-            <a href="{{ route('admin.filles.create') }}" class="btn-ink">Ajouter une fille</a>
+            <a href="{{ route('filles.import') }}" class="btn-outline">Importer depuis Excel</a>
+            <a href="{{ route('filles.create') }}" class="btn-ink">Ajouter une fille</a>
         </div>
     </x-slot>
+
+    <x-onglets.registre />
 
     <div class="table-card">
         <table>
@@ -38,15 +40,17 @@
                         </td>
                         <td>
                             <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ route('admin.filles.edit', $fille) }}" class="btn-outline btn-sm">Modifier</a>
-                                <form action="{{ route('admin.filles.toggle-statut', $fille) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn-sm {{ $fille->statut->value === 'actif' ? 'btn-danger-outline' : 'btn-success' }}">
-                                        {{ $fille->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
-                                    </button>
-                                </form>
-                                <form action="{{ route('admin.filles.regenerate-pin', $fille) }}" method="POST" class="d-inline">
+                                <a href="{{ route('filles.edit', $fille) }}" class="btn-outline btn-sm">Modifier</a>
+                                @can('toggleStatut', $fille)
+                                    <form action="{{ route('filles.toggle-statut', $fille) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-sm {{ $fille->statut->value === 'actif' ? 'btn-danger-outline' : 'btn-success' }}">
+                                            {{ $fille->statut->value === 'actif' ? 'Désactiver' : 'Réactiver' }}
+                                        </button>
+                                    </form>
+                                @endcan
+                                <form action="{{ route('filles.regenerate-pin', $fille) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn-outline btn-sm">Régénérer le PIN</button>

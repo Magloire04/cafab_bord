@@ -10,7 +10,7 @@
             <div class="content-card">
                 <p class="field-hint">Colonnes attendues : nom, prenom, contact (optionnel).</p>
 
-                <form action="{{ route('admin.filles.import.preview') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('filles.import.preview') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-4">
                         <input type="file" name="fichier" accept=".xlsx,.xls" class="field-control" required>

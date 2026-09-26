@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Models\Coach;
 use App\Models\Fille;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -34,10 +35,10 @@ function buildImportSpreadsheet(array $rows): UploadedFile
     return new UploadedFile($path, 'import.xlsx', null, null, true);
 }
 
-it('blocks a coach from importing', function () {
-    $this->actingAs(User::factory()->create(['role' => UserRole::Coach]))
-        ->get(route('admin.filles.import'))
-        ->assertForbidden();
+it('lets a coach open the Excel import', function () {
+    $coach = Coach::factory()->create();
+
+    $this->actingAs($coach->user)->get(route('filles.import'))->assertOk();
 });
 
 it('previews rows and flags a duplicate by nom+prenom', function () {
@@ -49,7 +50,7 @@ it('previews rows and flags a duplicate by nom+prenom', function () {
     ]);
 
     $response = $this->actingAs($this->admin)
-        ->post(route('admin.filles.import.preview'), ['fichier' => $file]);
+        ->post(route('filles.import.preview'), ['fichier' => $file]);
 
     $response->assertOk();
     $response->assertSee('Hounkpatin');
@@ -64,13 +65,13 @@ it('confirms the import and only creates the rows kept by the admin', function (
         ['Ahouandjinou', 'Lucrèce', ''],
     ]);
 
-    $this->actingAs($this->admin)->post(route('admin.filles.import.preview'), ['fichier' => $file]);
+    $this->actingAs($this->admin)->post(route('filles.import.preview'), ['fichier' => $file]);
 
-    $response = $this->actingAs($this->admin)->post(route('admin.filles.import.confirm'), [
+    $response = $this->actingAs($this->admin)->post(route('filles.import.confirm'), [
         'lignes' => [0, 1],
     ]);
 
-    $response->assertRedirect(route('admin.filles.index'));
+    $response->assertRedirect(route('filles.index'));
 
     expect(Fille::count())->toBe(2);
     expect(Fille::where('nom', 'Kpossou')->exists())->toBeTrue();

@@ -8,7 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="content-card">
-                <form action="{{ route('admin.plannings.store') }}" method="POST">
+                <form action="{{ route('plannings.store') }}" method="POST">
                     @csrf
 
                     <div class="mb-3">
@@ -29,17 +29,25 @@
                         @error('heure_debut') <p class="field-error">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <label for="coach_id" class="field-label">Coach référent</label>
-                        <select id="coach_id" name="coach_id" class="field-select" required>
-                            @foreach ($coaches as $coach)
-                                <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
-                                    {{ $coach->user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('coach_id') <p class="field-error">{{ $message }}</p> @enderror
-                    </div>
+                    @if (auth()->user()->role === \App\Enums\UserRole::Admin)
+                        <div class="mb-4">
+                            <label for="coach_id" class="field-label">Coach référent</label>
+                            <select id="coach_id" name="coach_id" class="field-select" required>
+                                @foreach ($coaches as $coach)
+                                    <option value="{{ $coach->id }}" {{ old('coach_id') == $coach->id ? 'selected' : '' }}>
+                                        {{ $coach->user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('coach_id') <p class="field-error">{{ $message }}</p> @enderror
+                        </div>
+                    @else
+                        <div class="mb-4">
+                            <span class="field-label">Coach référent</span>
+                            <input type="text" class="field-control" value="{{ auth()->user()->name }}" disabled>
+                            <p class="field-hint">Vos créneaux sont toujours à votre nom.</p>
+                        </div>
+                    @endif
 
                     <div class="d-grid">
                         <button type="submit" class="btn-ink justify-content-center">Créer</button>

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Registre;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateFilleRequest extends FormRequest
+class StoreFilleRequest extends FormRequest
 {
     public function authorize(): bool
     {

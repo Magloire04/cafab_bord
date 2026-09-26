@@ -3,10 +3,14 @@
         <div>
             <h1 class="page-title">Planning récurrent</h1>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.plannings.create') }}" class="btn-ink">Ajouter un créneau</a>
-        </div>
+        @can('create', \App\Models\PlanningRepetition::class)
+            <div class="d-flex gap-2">
+                <a href="{{ route('plannings.create') }}" class="btn-ink">Ajouter un créneau</a>
+            </div>
+        @endcan
     </x-slot>
+
+    <x-onglets.planning />
 
     <div class="table-card">
         <table>
@@ -33,16 +37,20 @@
                             @endif
                         </td>
                         <td>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <a href="{{ route('admin.plannings.edit', $planning) }}" class="btn-outline btn-sm">Modifier</a>
-                                <form action="{{ route('admin.plannings.toggle-actif', $planning) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="btn-sm {{ $planning->actif ? 'btn-danger-outline' : 'btn-success' }}">
-                                        {{ $planning->actif ? 'Désactiver' : 'Réactiver' }}
-                                    </button>
-                                </form>
-                            </div>
+                            @can('update', $planning)
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{{ route('plannings.edit', $planning) }}" class="btn-outline btn-sm">Modifier</a>
+                                    <form action="{{ route('plannings.toggle-actif', $planning) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-sm {{ $planning->actif ? 'btn-danger-outline' : 'btn-success' }}">
+                                            {{ $planning->actif ? 'Désactiver' : 'Réactiver' }}
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="field-hint">—</span>
+                            @endcan
                         </td>
                     </tr>
                 @endforeach

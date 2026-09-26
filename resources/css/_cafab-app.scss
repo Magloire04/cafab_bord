@@ -663,3 +663,30 @@ textarea.field-control {
   font-size: 20px;
   color: var(--ink);
 }
+
+/* Onglets internes des sections Registre, Planning, Prestations & cachets */
+.onglets {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.onglet {
+  padding: 10px 16px;
+  margin-bottom: -1px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+.onglet:hover {
+  color: var(--ink);
+}
+
+.onglet.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}

@@ -9,6 +9,8 @@
         </div>
     </x-slot>
 
+    <x-onglets.registre />
+
     <div class="table-card">
         <table>
             <thead>

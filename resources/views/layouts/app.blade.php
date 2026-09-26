@@ -19,34 +19,36 @@
             <x-horloge variante="sidebar" />
 
             <nav class="d-flex flex-column gap-1">
+                @php($estAdmin = auth()->user()->role === \App\Enums\UserRole::Admin)
+
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     Tableau de bord
                 </a>
 
-                @if (auth()->user()->role === \App\Enums\UserRole::Admin)
-                    <a href="{{ route('admin.coaches.index') }}" class="nav-link {{ request()->routeIs(['admin.coaches.*', 'admin.filles.*']) ? 'active' : '' }}">
-                        Registre
-                    </a>
-                    <a href="{{ route('admin.plannings.index') }}" class="nav-link {{ request()->routeIs(['admin.plannings.*', 'admin.calendrier', 'admin.pointages.*', 'seances.create-extraordinaire']) ? 'active' : '' }}">
-                        Planning
-                    </a>
-                    <a href="{{ route('admin.prestations.index') }}" class="nav-link {{ request()->routeIs(['admin.prestations.*', 'admin.paiements.*']) ? 'active' : '' }}">
-                        Prestations &amp; cachets
-                    </a>
-                    <a href="{{ route('admin.rapports.index') }}" class="nav-link {{ request()->routeIs('admin.rapports.*') ? 'active' : '' }}">
-                        Rapports
-                    </a>
-                @endif
-
-                @if (auth()->user()->role === \App\Enums\UserRole::Coach)
+                @unless ($estAdmin)
                     <a href="{{ route('coach.seance') }}" class="nav-link {{ request()->routeIs('coach.seance') ? 'active' : '' }}">
                         Ma répétition
                     </a>
                     <a href="{{ route('coach.historique') }}" class="nav-link {{ request()->routeIs('coach.historique') ? 'active' : '' }}">
                         Mon historique
                     </a>
-                    <a href="{{ route('seances.create-extraordinaire') }}" class="nav-link {{ request()->routeIs('seances.create-extraordinaire') ? 'active' : '' }}">
-                        Séance extraordinaire
+                @endunless
+
+                <a href="{{ $estAdmin ? route('admin.coaches.index') : route('filles.index') }}"
+                   class="nav-link {{ request()->routeIs(['admin.coaches.*', 'filles.*']) ? 'active' : '' }}">
+                    Registre
+                </a>
+                <a href="{{ route('plannings.index') }}"
+                   class="nav-link {{ request()->routeIs(['plannings.*', 'admin.calendrier', 'admin.pointages.*', 'seances.create-extraordinaire']) ? 'active' : '' }}">
+                    Planning
+                </a>
+
+                @if ($estAdmin)
+                    <a href="{{ route('admin.prestations.index') }}" class="nav-link {{ request()->routeIs(['admin.prestations.*', 'admin.paiements.*']) ? 'active' : '' }}">
+                        Prestations &amp; cachets
+                    </a>
+                    <a href="{{ route('admin.rapports.index') }}" class="nav-link {{ request()->routeIs('admin.rapports.*') ? 'active' : '' }}">
+                        Rapports
                     </a>
                 @endif
 

@@ -5,6 +5,8 @@
         </div>
     </x-slot>
 
+    <x-onglets.planning />
+
     <div class="table-card">
         <table>
             <thead>
