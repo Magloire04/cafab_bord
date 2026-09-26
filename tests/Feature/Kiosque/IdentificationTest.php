@@ -21,6 +21,25 @@ it('shows the next répétition when none is in progress', function () {
     Carbon::setTestNow();
 });
 
+it('renders the same séance ids as the polled state while a séance is in progress', function () {
+    Carbon::setTestNow('2026-09-26 17:10:00');
+    $enCours = Seance::factory()->create(['date' => '2026-09-26', 'heure_prevue' => '17:00:00', 'statut' => StatutSeance::EnCours]);
+    Seance::factory()->create(['date' => '2026-10-03', 'heure_prevue' => '17:00:00', 'statut' => StatutSeance::AVenir]);
+
+    $etat = $this->getJson(route('kiosque.etat'))->assertOk()->json();
+    expect($etat['en_cours_id'])->toBe($enCours->id);
+    expect($etat['prochaine'])->not->toBeNull();
+
+    $this->get(route('kiosque.home'))
+        ->assertOk()
+        ->assertSee('data-en-cours-id="'.$etat['en_cours_id'].'"', false)
+        ->assertSee('data-prochaine-id="'.$etat['prochaine']['id'].'"', false)
+        ->assertSee('Répétition en cours, début prévu 17:00')
+        ->assertDontSee('Prochaine répétition');
+
+    Carbon::setTestNow();
+});
+
 it('identifies a fille by pin and stores it in the session', function () {
     $fille = Fille::factory()->create(['pin' => '1234']);
     Seance::factory()->create(['statut' => StatutSeance::EnCours]);

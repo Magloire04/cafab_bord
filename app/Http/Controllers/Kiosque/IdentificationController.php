@@ -16,11 +16,14 @@ class IdentificationController extends Controller
 {
     public function home(EtatSeances $etat): View
     {
-        $seance = Seance::where('statut', 'en_cours')->whereDate('date', today())->latest('heure_prevue')->first();
+        // Un seul calcul pour la page et pour ses attributs data-* : le script de
+        // rafraîchissement compare ces identifiants à ceux de kiosque.etat, qui
+        // renvoie les mêmes. S'ils différaient, le kiosque se rechargerait en boucle.
+        $etatKiosque = $etat->pourKiosque();
 
         return view('kiosque.accueil', [
-            'seance' => $seance,
-            'prochaine' => $seance ? null : $etat->pourKiosque()['prochaine'],
+            'seance' => $etatKiosque['en_cours_id'] ? Seance::with('coach.user')->find($etatKiosque['en_cours_id']) : null,
+            'prochaine' => $etatKiosque['prochaine'],
         ]);
     }
 
