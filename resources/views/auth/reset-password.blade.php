@@ -1,9 +1,4 @@
 <x-guest-layout>
-    <div class="logo-box">
-        <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
-    </div>
-
-    <p class="overline mb-1">Présence &amp; paiements</p>
     <h1 class="page-title">Réinitialiser le mot de passe</h1>
 
     <form method="POST" action="{{ route('password.store') }}">

@@ -16,6 +16,7 @@
             <div class="logo-box">
                 <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
             </div>
+            <x-horloge variante="sidebar" />
 
             <nav class="d-flex flex-column gap-1">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">

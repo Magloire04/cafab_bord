@@ -637,3 +637,29 @@ textarea.field-control {
 .kiosk-title-sm { font-size: 36px; }
 .kiosk-cachet-title { font-weight: 700; font-size: 20px; margin-bottom: 4px; }
 .kiosk-cachet-amount { font-size: 22px; }
+
+/* Horloge en temps réel (#13) */
+.horloge {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.horloge-sidebar {
+  color: var(--sidebar-text);
+  text-align: center;
+  margin: -16px 0 24px;
+}
+
+.horloge-auth {
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+
+.horloge-kiosque {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--ink);
+}

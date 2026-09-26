@@ -20,10 +20,7 @@
                 @if ($seance)
                     <span class="badge-st st-fort">Séance en cours</span>
                 @endif
-                <span class="page-title kiosk-clock"
-                      x-data="{ heure: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) }"
-                      x-init="setInterval(() => heure = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}), 10000)"
-                      x-text="heure"></span>
+                <x-horloge variante="kiosque" />
             </div>
         </div>
 

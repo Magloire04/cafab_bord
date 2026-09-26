@@ -1,9 +1,4 @@
 <x-guest-layout>
-    <div class="logo-box">
-        <img src="{{ asset('images/logo-cafab.png') }}" alt="CAFAB">
-    </div>
-
-    <p class="overline mb-1">Présence &amp; paiements</p>
     <h1 class="page-title">Mot de passe oublié</h1>
 
     <p class="field-hint mt-2 mb-0">
